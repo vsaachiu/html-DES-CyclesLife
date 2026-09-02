@@ -12,14 +12,25 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#312e81',
+                        burgundy: {
+                            DEFAULT: '#7C162D',
+                            50: '#fdf2f4',
+                            100: '#fbe4e8',
+                            200: '#f7cdd5',
+                            600: '#8e1a34',
+                            700: '#7C162D',
+                            800: '#691226',
+                            900: '#581021'
+                        },
+                        navy: {
+                            DEFAULT: '#1E4B7C',
+                            50: '#f0f6fc',
+                            100: '#e1ecf8',
+                            200: '#c3dbf2',
+                            600: '#1b436f',
+                            700: '#1E4B7C',
+                            800: '#183c63',
+                            900: '#13304f'
                         }
                     },
                     fontFamily: {
@@ -72,46 +83,47 @@
 
         /* SOI Term highlighting */
         .soi-highlight {
-            background-color: rgba(99, 102, 241, 0.12);
-            color: #4338ca;
-            padding: 0.1rem 0.35rem;
-            border-radius: 0.3rem;
+            background-color: rgba(30, 75, 124, 0.10);
+            color: #1E4B7C;
+            padding: 0.12rem 0.4rem;
+            border-radius: 0.35rem;
             font-weight: 700;
-            border-bottom: 2px solid #818cf8;
+            border-bottom: 2px solid #7C162D;
         }
 
         /* Inline Code styling */
         code {
             font-family: 'Fira Code', monospace;
             background-color: #f1f5f9;
-            color: #d946ef;
-            padding: 0.1rem 0.3rem;
+            color: #7C162D;
+            padding: 0.1rem 0.35rem;
             border-radius: 0.25rem;
-            font-size: 0.88em;
+            font-size: 0.9em;
             font-weight: 600;
+            border: 1px solid rgba(124, 22, 45, 0.15);
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-[#7C162D] selection:text-white">
 
-    <!-- Top Global Header -->
-    <header class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-700 text-white shadow-lg sticky top-0 z-40">
+    <!-- Top Global Header with Brand Gradient (#7C162D to #1E4B7C) -->
+    <header class="bg-gradient-to-r from-[#7C162D] via-[#5b1e45] to-[#1E4B7C] text-white shadow-lg sticky top-0 z-40 border-b-2 border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 
                 <!-- Title & Meta -->
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-xl shadow-inner shrink-0">
-                        <i class="fa-solid fa-microchip text-yellow-300"></i>
+                        <i class="fa-solid fa-microchip text-amber-300"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs uppercase font-extrabold tracking-wider bg-indigo-900/60 px-2 py-0.5 rounded text-indigo-200 border border-indigo-400/30">
+                            <span class="text-xs uppercase font-extrabold tracking-wider bg-black/30 px-2.5 py-0.5 rounded text-white/90 border border-white/20">
                                 MYP Year 8 Design
                             </span>
-                            <span class="text-xs text-indigo-200">The Cycles of Life • 生命的循環</span>
+                            <span class="text-xs text-white/80">The Cycles of Life • 生命的循環</span>
                         </div>
-                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight">
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white">
                             Interactive Concept & Vocabulary Explorer
                         </h1>
                     </div>
@@ -121,24 +133,24 @@
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 self-end md:self-auto">
                     
                     <!-- Language Selector Toggle -->
-                    <div class="bg-indigo-950/60 p-1 rounded-xl border border-white/15 flex items-center shadow-inner">
-                        <button id="langEnBtn" onclick="setLanguage('en')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-indigo-900 shadow">
+                    <div class="bg-black/30 p-1 rounded-xl border border-white/15 flex items-center shadow-inner">
+                        <button id="langEnBtn" onclick="setLanguage('en')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-[#7C162D] shadow">
                             <span>🇬🇧</span> <span class="hidden sm:inline">English</span>
                         </button>
-                        <button id="langZhBtn" onclick="setLanguage('zh')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white">
+                        <button id="langZhBtn" onclick="setLanguage('zh')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-white/80 hover:text-white">
                             <span>🇭🇰</span> <span>繁體中文</span>
                         </button>
-                        <button id="langBothBtn" onclick="setLanguage('both')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white">
+                        <button id="langBothBtn" onclick="setLanguage('both')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-white/80 hover:text-white">
                             <span>🌐</span> <span class="hidden sm:inline">Dual</span>
                         </button>
                     </div>
 
                     <!-- View Mode Toggle: Glossary List vs Flash Cards -->
-                    <div class="bg-indigo-950/60 p-1 rounded-xl border border-white/15 flex items-center shadow-inner">
-                        <button id="modeListBtn" onclick="setViewMode('list')" class="px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-indigo-500 text-white shadow">
+                    <div class="bg-black/30 p-1 rounded-xl border border-white/15 flex items-center shadow-inner">
+                        <button id="modeListBtn" onclick="setViewMode('list')" class="px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-[#1E4B7C] shadow">
                             <i class="fa-solid fa-book-open"></i> <span>Glossary</span>
                         </button>
-                        <button id="modeFlashBtn" onclick="setViewMode('flashcards')" class="px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white">
+                        <button id="modeFlashBtn" onclick="setViewMode('flashcards')" class="px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-white/80 hover:text-white">
                             <i class="fa-solid fa-layer-group"></i> <span>Flash Cards</span>
                         </button>
                     </div>
@@ -146,14 +158,14 @@
             </div>
 
             <!-- Statement of Inquiry Banner -->
-            <div class="mt-3 pt-3 border-t border-indigo-500/40 flex items-center justify-between text-xs sm:text-sm text-indigo-100 flex-wrap gap-2">
+            <div class="mt-3 pt-3 border-t border-white/15 flex items-center justify-between text-xs sm:text-sm text-white/90 flex-wrap gap-2">
                 <div class="flex items-center gap-2">
-                    <span class="font-bold text-yellow-300 flex items-center gap-1">
+                    <span class="font-bold text-amber-300 flex items-center gap-1">
                         <i class="fa-solid fa-quote-left"></i> SOI:
                     </span>
                     <span id="soiText">"Real world phenomena can be simulated as simplified cycles."</span>
                 </div>
-                <div class="text-[11px] bg-white/10 px-2 py-0.5 rounded text-indigo-200">
+                <div class="text-[11px] bg-white/15 px-2.5 py-0.5 rounded text-white/90 font-medium">
                     <span id="termCounter">26</span> terms loaded
                 </div>
             </div>
@@ -174,7 +186,7 @@
                         id="searchInput" 
                         oninput="handleSearch(this.value)"
                         placeholder="Search term, keyword, or code..." 
-                        class="w-full pl-8 pr-8 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-slate-50 transition"
+                        class="w-full pl-8 pr-8 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1E4B7C] focus:border-transparent bg-slate-50 transition"
                     >
                     <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                         <i class="fa-solid fa-circle-xmark text-xs"></i>
@@ -183,16 +195,16 @@
 
                 <!-- Category Filters -->
                 <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-                    <button onclick="filterCategory('all')" class="cat-pill active text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-indigo-600 text-white border-indigo-600 shrink-0">
+                    <button onclick="filterCategory('all')" class="cat-pill active text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-[#1E4B7C] text-white border-[#1E4B7C] shrink-0 shadow-sm">
                         All
                     </button>
-                    <button onclick="filterCategory('Logic & Code')" class="cat-pill text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 shrink-0">
+                    <button onclick="filterCategory('Logic & Code')" class="cat-pill text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 shrink-0">
                         Logic & Code
                     </button>
-                    <button onclick="filterCategory('Systems & Hardware')" class="cat-pill text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 shrink-0">
+                    <button onclick="filterCategory('Systems & Hardware')" class="cat-pill text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 shrink-0">
                         Systems & Micro:bit
                     </button>
-                    <button onclick="filterCategory('Thinking & Design')" class="cat-pill text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 shrink-0">
+                    <button onclick="filterCategory('Thinking & Design')" class="cat-pill text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 shrink-0">
                         Design & Modelling
                     </button>
                 </div>
@@ -201,23 +213,23 @@
             <!-- Right: Flashcard Action Buttons (Visible only in Flashcard Mode) -->
             <div id="flashcardToolbar" class="hidden flex items-center gap-2 justify-end">
                 <!-- Shuffle Button -->
-                <button onclick="shuffleCards()" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 shadow-sm active:scale-95">
-                    <i class="fa-solid fa-shuffle text-indigo-500"></i>
+                <button onclick="shuffleCards()" class="px-3.5 py-1.5 text-xs font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="fa-solid fa-shuffle text-[#1E4B7C]"></i>
                     <span>Shuffle</span>
                 </button>
 
                 <!-- Flip All Button -->
-                <button id="flipAllBtn" onclick="toggleFlipAll()" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition flex items-center gap-1.5 shadow-sm active:scale-95">
-                    <i class="fa-solid fa-arrows-rotate text-indigo-600"></i>
-                    <span id="flipAllLabel">Flip All</span>
+                <button id="flipAllBtn" onclick="toggleFlipAll()" class="px-3.5 py-1.5 text-xs font-bold rounded-lg border border-[#7C162D]/30 bg-[#fdf2f4] hover:bg-[#fbe4e8] text-[#7C162D] transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="fa-solid fa-arrows-rotate text-[#7C162D]"></i>
+                    <span id="flipAllLabel">Flip to Definitions</span>
                 </button>
 
                 <!-- Study Focus View Mode Toggle -->
                 <div class="bg-slate-100 p-0.5 rounded-lg border border-slate-200 flex items-center">
-                    <button id="layoutGridBtn" onclick="setCardLayout('grid')" title="Grid View" class="p-1.5 text-xs rounded bg-white text-indigo-600 shadow-sm">
+                    <button id="layoutGridBtn" onclick="setCardLayout('grid')" title="Grid View" class="p-1.5 text-xs rounded bg-white text-[#1E4B7C] shadow-sm">
                         <i class="fa-solid fa-table-cells"></i>
                     </button>
-                    <button id="layoutFocusBtn" onclick="setCardLayout('focus')" title="1-by-1 Focus Mode" class="p-1.5 text-xs rounded text-slate-500 hover:text-indigo-600">
+                    <button id="layoutFocusBtn" onclick="setCardLayout('focus')" title="1-by-1 Focus Mode" class="p-1.5 text-xs rounded text-slate-500 hover:text-[#1E4B7C]">
                         <i class="fa-solid fa-expand"></i>
                     </button>
                 </div>
@@ -227,23 +239,23 @@
     </section>
 
     <!-- Main Content Stage -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
         
-        <!-- View A: Standard Glossary List View -->
-        <div id="glossaryView" class="space-y-4">
-            <!-- Grid of Definitions -->
-            <div id="glossaryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- View A: Standard Glossary List View (1 Card Per Row, Generous Spacing) -->
+        <div id="glossaryView" class="w-full">
+            <!-- Spacious Single Column Stack -->
+            <div id="glossaryGrid" class="flex flex-col gap-6 max-w-4xl mx-auto">
                 <!-- Injected via JavaScript -->
             </div>
             
             <!-- Empty Search State -->
-            <div id="emptySearchNotice" class="hidden py-16 text-center">
-                <div class="w-16 h-16 rounded-full bg-indigo-50 text-indigo-400 mx-auto flex items-center justify-center text-2xl mb-3">
+            <div id="emptySearchNotice" class="hidden py-16 text-center max-w-md mx-auto bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+                <div class="w-16 h-16 rounded-full bg-[#fdf2f4] text-[#7C162D] mx-auto flex items-center justify-center text-2xl mb-4 shadow-inner">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
                 <h3 class="text-base font-bold text-slate-800">No matching vocabulary found</h3>
-                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Try typing a different keyword, such as "loop", "modulus", "餘數", or clearing your filters.</p>
-                <button onclick="clearSearch()" class="mt-4 px-4 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 transition">
+                <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">Try typing a different keyword, such as "loop", "modulus", "餘數", or clearing your filters.</p>
+                <button onclick="clearSearch()" class="mt-5 px-5 py-2 bg-[#1E4B7C] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-[#183c63] transition shadow-sm">
                     Reset Search
                 </button>
             </div>
@@ -252,11 +264,11 @@
         <!-- View B: Flash Cards Mode View -->
         <div id="flashcardsView" class="hidden">
             
-            <!-- 1-by-1 Focus Carousel Mode (Hidden by default, toggled via layout) -->
-            <div id="focusModeContainer" class="hidden max-w-xl mx-auto mb-8">
-                <div class="flex items-center justify-between text-xs text-slate-500 font-semibold mb-2 px-1">
-                    <span id="focusCardCounter">Card 1 of 26</span>
-                    <span>Use <kbd class="px-1.5 py-0.5 bg-slate-200 rounded border border-slate-300 font-mono">←</kbd> <kbd class="px-1.5 py-0.5 bg-slate-200 rounded border border-slate-300 font-mono">→</kbd> keys or swipe</span>
+            <!-- 1-by-1 Focus Carousel Mode -->
+            <div id="focusModeContainer" class="hidden max-w-2xl mx-auto mb-8">
+                <div class="flex items-center justify-between text-xs text-slate-500 font-semibold mb-2.5 px-1">
+                    <span id="focusCardCounter" class="bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-sm font-bold text-slate-700">Card 1 of 26</span>
+                    <span>Use <kbd class="px-1.5 py-0.5 bg-slate-200 rounded border border-slate-300 font-mono">←</kbd> <kbd class="px-1.5 py-0.5 bg-slate-200 rounded border border-slate-300 font-mono">→</kbd> keys or spacebar</span>
                 </div>
 
                 <!-- Single Focus Card Container -->
@@ -265,15 +277,15 @@
                 </div>
 
                 <!-- Navigation Controls -->
-                <div class="flex items-center justify-center gap-4 mt-4">
-                    <button onclick="navFocusCard(-1)" class="w-10 h-10 rounded-full bg-white border border-slate-300 shadow-sm hover:bg-slate-50 text-slate-700 flex items-center justify-center transition active:scale-90">
+                <div class="flex items-center justify-center gap-4 mt-5">
+                    <button onclick="navFocusCard(-1)" class="w-11 h-11 rounded-full bg-white border border-slate-300 shadow-sm hover:bg-slate-50 text-slate-700 flex items-center justify-center transition active:scale-90">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
-                    <button onclick="toggleSingleFocusFlip()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md hover:bg-indigo-700 active:scale-95 transition flex items-center gap-2">
+                    <button onclick="toggleSingleFocusFlip()" class="px-6 py-2.5 rounded-xl bg-[#7C162D] text-white font-bold text-xs sm:text-sm shadow-md hover:bg-[#691226] active:scale-95 transition flex items-center gap-2">
                         <i class="fa-solid fa-rotate"></i>
-                        <span>Click to Flip</span>
+                        <span>Click / Spacebar to Flip</span>
                     </button>
-                    <button onclick="navFocusCard(1)" class="w-10 h-10 rounded-full bg-white border border-slate-300 shadow-sm hover:bg-slate-50 text-slate-700 flex items-center justify-center transition active:scale-90">
+                    <button onclick="navFocusCard(1)" class="w-11 h-11 rounded-full bg-white border border-slate-300 shadow-sm hover:bg-slate-50 text-slate-700 flex items-center justify-center transition active:scale-90">
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
@@ -281,14 +293,14 @@
 
             <!-- Flash Card Grid Mode -->
             <div id="flashcardGridContainer">
-                <div class="mb-3 flex items-center justify-between text-xs text-slate-500 px-1">
-                    <span class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-hand-pointer text-indigo-500"></i>
-                        <span>Click any card to flip between <strong>Term</strong> and <strong>Definition</strong>.</span>
+                <div class="mb-4 flex items-center justify-between text-xs sm:text-sm text-slate-600 px-1 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-[#7C162D] text-base"></i>
+                        <span><strong>Recall Challenge:</strong> Read the definition on the back, and test if you can guess the matching term!</span>
                     </span>
-                    <span class="hidden sm:inline text-slate-400">Card count: <strong id="cardGridCount">26</strong></span>
+                    <span class="hidden sm:inline text-slate-400 font-medium">Card count: <strong id="cardGridCount" class="text-slate-700">26</strong></span>
                 </div>
-                <div id="flashcardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div id="flashcardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Injected via JavaScript -->
                 </div>
             </div>
@@ -299,15 +311,12 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-medium text-slate-700">
+        <div class="max-w-7xl mx-auto px-4 space-y-1.5">
+            <p class="font-bold text-slate-700">
                 MYP Year 8 Design • Scientific & Technical Innovation
             </p>
-            <p class="text-slate-400">
-                Key Concept: <strong>Systems</strong> | Related Concepts: <strong>Cycles</strong> & <strong>Simulations</strong>
-            </p>
-            <p class="text-[11px] text-slate-400">
-                Designed for Microsoft MakeCode & Micro:bit JavaScript Simulation Unit.
+            <p class="text-slate-500">
+                Key Concept: <span class="font-bold text-[#1E4B7C]">Systems</span> | Related Concepts: <span class="font-bold text-[#7C162D]">Cycles</span> & <span class="font-bold text-[#1E4B7C]">Simulations</span>
             </p>
         </div>
     </footer>
@@ -755,11 +764,11 @@
         function getCategoryBadge(cat) {
             switch(cat) {
                 case 'Logic & Code':
-                    return 'bg-purple-100 text-purple-800 border-purple-200';
+                    return 'bg-[#fdf2f4] text-[#7C162D] border-[#7C162D]/30';
                 case 'Systems & Hardware':
-                    return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                    return 'bg-[#f0f6fc] text-[#1E4B7C] border-[#1E4B7C]/30';
                 case 'Thinking & Design':
-                    return 'bg-amber-100 text-amber-800 border-amber-200';
+                    return 'bg-amber-50 text-amber-800 border-amber-300';
                 default:
                     return 'bg-slate-100 text-slate-800 border-slate-200';
             }
@@ -780,63 +789,64 @@
             container.innerHTML = filteredVocabList.map((item, index) => {
                 const badgeStyle = getCategoryBadge(item.category);
                 
-                // Determine term heading
                 let termHtml = '';
                 let defHtml = '';
                 let exHtml = '';
 
                 if (currentLang === 'en') {
-                    termHtml = `<span class="text-indigo-900">${item.term.en}</span>`;
+                    termHtml = `<span class="text-slate-900">${item.term.en}</span>`;
                     defHtml = item.definition.en;
                     exHtml = item.example.en;
                 } else if (currentLang === 'zh') {
-                    termHtml = `<span class="text-indigo-900">${item.term.zh}</span>`;
+                    termHtml = `<span class="text-slate-900">${item.term.zh}</span>`;
                     defHtml = item.definition.zh;
                     exHtml = item.example.zh;
                 } else {
-                    // Both
-                    termHtml = `<span class="text-indigo-900">${item.term.en}</span> <span class="text-sm font-semibold text-slate-500 block sm:inline">(${item.term.zh})</span>`;
+                    // Both (Dual View)
+                    termHtml = `<span class="text-slate-900">${item.term.en}</span> <span class="text-base sm:text-lg font-bold text-[#7C162D] block sm:inline sm:ml-2">(${item.term.zh})</span>`;
                     defHtml = `
-                        <div class="space-y-2">
-                            <div><span class="text-[10px] font-bold text-indigo-500 uppercase">EN:</span> ${item.definition.en}</div>
-                            <div class="pt-1 border-t border-slate-100"><span class="text-[10px] font-bold text-emerald-600 uppercase">中文:</span> ${item.definition.zh}</div>
+                        <div class="space-y-3">
+                            <div class="leading-relaxed"><span class="text-[11px] font-bold text-[#1E4B7C] uppercase tracking-wider block mb-0.5">🇬🇧 English:</span> ${item.definition.en}</div>
+                            <div class="pt-2.5 border-t border-slate-100 leading-relaxed"><span class="text-[11px] font-bold text-[#7C162D] uppercase tracking-wider block mb-0.5">🇭🇰 繁體中文:</span> ${item.definition.zh}</div>
                         </div>
                     `;
                     exHtml = `
-                        <div class="space-y-1">
-                            <div><span class="text-[10px] font-bold text-indigo-500 uppercase">EN:</span> ${item.example.en}</div>
-                            <div><span class="text-[10px] font-bold text-emerald-600 uppercase">中文:</span> ${item.example.zh}</div>
+                        <div class="space-y-2">
+                            <div><span class="text-[11px] font-bold text-[#1E4B7C] uppercase mr-1">EN:</span> ${item.example.en}</div>
+                            <div class="pt-1 border-t border-slate-200/60"><span class="text-[11px] font-bold text-[#7C162D] uppercase mr-1">中文:</span> ${item.example.zh}</div>
                         </div>
                     `;
                 }
 
                 return `
-                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
                         <div>
-                            <!-- Card Header: Term & Category -->
-                            <div class="flex items-start justify-between gap-2 mb-3">
-                                <div>
-                                    <div class="text-[10px] font-bold text-slate-400 font-mono">#${index + 1}</div>
-                                    <h3 class="text-lg font-extrabold tracking-tight group-hover:text-indigo-600 transition">
+                            <!-- Header: Term, Index, & Category Badge -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4 pb-3 border-b border-slate-100">
+                                <div class="flex items-baseline gap-3">
+                                    <span class="text-xs font-mono font-bold text-[#7C162D] bg-[#fdf2f4] px-2.5 py-0.5 rounded-md border border-[#7C162D]/20 shrink-0">
+                                        #${index + 1}
+                                    </span>
+                                    <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight group-hover:text-[#1E4B7C] transition">
                                         ${termHtml}
                                     </h3>
                                 </div>
-                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 ${badgeStyle}">
+                                <span class="text-[11px] font-bold uppercase px-3 py-1 rounded-full border self-start sm:self-auto shrink-0 shadow-xs ${badgeStyle}">
                                     ${item.category}
                                 </span>
                             </div>
 
-                            <!-- Definition -->
-                            <div class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                            <!-- Definition (Enlarged font and line height) -->
+                            <div class="text-sm sm:text-base text-slate-700 leading-relaxed mb-5">
                                 ${defHtml}
                             </div>
                         </div>
 
-                        <!-- Example Box -->
-                        <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-600">
-                            <div class="font-bold text-slate-700 flex items-center gap-1.5 mb-1 text-[11px]">
-                                <i class="fa-solid fa-code text-indigo-500"></i>
-                                <span>${currentLang === 'zh' ? '範例 (Example):' : 'Example:'}</span>
+                        <!-- Example Box (Spacious, Clear) -->
+                        <div class="bg-slate-50 border-l-4 border-[#1E4B7C] rounded-r-xl p-4 text-xs sm:text-sm text-slate-600">
+                            <div class="font-bold text-[#1E4B7C] flex items-center gap-2 mb-1 text-xs uppercase tracking-wider">
+                                <i class="fa-solid fa-code"></i>
+                                <span>${currentLang === 'zh' ? '單元範例 (Example):' : 'Unit Example:'}</span>
                             </div>
                             <div class="leading-relaxed">
                                 ${exHtml}
@@ -866,16 +876,16 @@
                 const badgeStyle = getCategoryBadge(item.category);
 
                 let frontTerm = (currentLang === 'zh') ? item.term.zh : item.term.en;
-                let secondaryTerm = (currentLang === 'both') ? `<div class="text-xs text-indigo-200 mt-1">${item.term.zh}</div>` : '';
+                let secondaryTerm = (currentLang === 'both') ? `<div class="text-xs text-[#7C162D] font-bold mt-1">${item.term.zh}</div>` : '';
 
                 let defContent = (currentLang === 'zh') ? item.definition.zh : item.definition.en;
                 let exContent = (currentLang === 'zh') ? item.example.zh : item.example.en;
 
                 if (currentLang === 'both') {
                     defContent = `
-                        <div class="text-xs space-y-1 mb-2">
+                        <div class="text-xs space-y-2 mb-2">
                             <p>${item.definition.en}</p>
-                            <p class="text-slate-500 border-t border-slate-100 pt-1 text-[11px]">${item.definition.zh}</p>
+                            <p class="text-slate-500 border-t border-slate-100 pt-1.5 text-[11px]">${item.definition.zh}</p>
                         </div>
                     `;
                     exContent = `
@@ -890,16 +900,16 @@
                         <div id="card-inner-${item.id}" class="preserve-3d relative w-full h-full rounded-2xl shadow-sm border border-slate-200 transition-transform duration-500 ${isFlipped ? 'rotate-y-180' : ''}">
                             
                             <!-- FRONT OF CARD (Vocabulary Term) -->
-                            <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 flex flex-col justify-between items-center text-center border-2 border-transparent hover:border-indigo-200 transition">
+                            <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-[#f0f6fc] rounded-2xl p-6 flex flex-col justify-between items-center text-center border-2 border-transparent hover:border-[#1E4B7C]/40 transition">
                                 <div class="w-full flex items-center justify-between text-xs text-slate-400">
-                                    <span class="font-mono font-bold">#${index + 1}</span>
-                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${badgeStyle}">
+                                    <span class="font-mono font-bold text-[#7C162D]">#${index + 1}</span>
+                                    <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${badgeStyle}">
                                         ${item.category}
                                     </span>
                                 </div>
 
                                 <div class="my-auto px-2">
-                                    <div class="w-12 h-12 mx-auto rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-3 shadow-inner">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-[#fdf2f4] text-[#7C162D] flex items-center justify-center text-xl mb-3 shadow-inner">
                                         <i class="fa-solid fa-lightbulb"></i>
                                     </div>
                                     <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
@@ -908,18 +918,20 @@
                                     ${secondaryTerm}
                                 </div>
 
-                                <div class="text-[11px] text-indigo-500 font-semibold flex items-center gap-1.5 bg-indigo-50 px-3 py-1 rounded-full">
-                                    <i class="fa-solid fa-rotate text-xs"></i> Click or tap to reveal definition
+                                <div class="text-[11px] text-[#1E4B7C] font-semibold flex items-center gap-1.5 bg-[#f0f6fc] px-3 py-1 rounded-full border border-[#1E4B7C]/20">
+                                    <i class="fa-solid fa-rotate text-xs"></i> Click to view definition
                                 </div>
                             </div>
 
-                            <!-- BACK OF CARD (Definition & Example) -->
-                            <div class="backface-hidden rotate-y-180 absolute inset-0 bg-white rounded-2xl p-5 flex flex-col justify-between border-2 border-indigo-400/40 shadow-inner overflow-hidden">
+                            <!-- BACK OF CARD (Definition & Example ONLY - Vocabulary term hidden to test recall) -->
+                            <div class="backface-hidden rotate-y-180 absolute inset-0 bg-white rounded-2xl p-5 flex flex-col justify-between border-2 border-[#1E4B7C]/50 shadow-inner overflow-hidden">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                                    <h4 class="font-extrabold text-sm text-indigo-900 line-clamp-1">
-                                        ${item.term.en}
-                                    </h4>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Definition</span>
+                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#1E4B7C] flex items-center gap-1.5">
+                                        <i class="fa-solid fa-circle-question text-[#7C162D]"></i> Can you name the term?
+                                    </span>
+                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${badgeStyle}">
+                                        ${item.category}
+                                    </span>
                                 </div>
 
                                 <!-- Definition Text -->
@@ -929,16 +941,16 @@
 
                                 <!-- Example Box -->
                                 <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 text-[11px] text-slate-600">
-                                    <span class="font-bold text-indigo-700 block mb-0.5">
-                                        <i class="fa-solid fa-code text-[10px]"></i> ${currentLang === 'zh' ? '範例 (Example):' : 'Example:'}
+                                    <span class="font-bold text-[#1E4B7C] block mb-0.5">
+                                        <i class="fa-solid fa-code text-[10px]"></i> ${currentLang === 'zh' ? '範例 (Example):' : 'Unit Clue / Example:'}
                                     </span>
                                     <div class="line-clamp-2">
                                         ${exContent}
                                     </div>
                                 </div>
 
-                                <div class="text-[10px] text-slate-400 text-center pt-1">
-                                    Click again to flip back
+                                <div class="text-[10px] text-slate-400 text-center pt-1 font-medium">
+                                    Click card to reveal term
                                 </div>
                             </div>
 
@@ -947,7 +959,6 @@
                 `;
             }).join('');
 
-            // If in focus layout, also update focus card
             if (cardLayout === 'focus') {
                 renderFocusCard();
             }
@@ -983,40 +994,43 @@
                     <div id="focus-inner-${item.id}" class="preserve-3d relative w-full h-full rounded-2xl shadow-lg border border-slate-200 transition-transform duration-500 ${isFlipped ? 'rotate-y-180' : ''}">
                         
                         <!-- FRONT -->
-                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-2xl p-8 flex flex-col justify-between items-center text-center border-2 border-indigo-200">
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-[#fdf2f4] via-white to-[#f0f6fc] rounded-2xl p-8 flex flex-col justify-between items-center text-center border-2 border-[#1E4B7C]/30">
                             <div class="w-full flex items-center justify-between text-xs text-slate-400">
-                                <span class="font-mono font-bold text-sm text-indigo-600">#${activeFocusIndex + 1}</span>
+                                <span class="font-mono font-bold text-sm text-[#7C162D]">#${activeFocusIndex + 1}</span>
                                 <span class="text-xs font-bold uppercase px-3 py-1 rounded-full border ${badgeStyle}">
                                     ${item.category}
                                 </span>
                             </div>
 
                             <div class="my-auto px-4">
-                                <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl mb-4 shadow-md">
+                                <div class="w-16 h-16 mx-auto rounded-2xl bg-[#7C162D] text-white flex items-center justify-center text-2xl mb-4 shadow-md">
                                     <i class="fa-solid fa-graduation-cap"></i>
                                 </div>
                                 <h3 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                                     ${frontTerm}
                                 </h3>
-                                ${currentLang === 'both' ? `<div class="text-sm font-medium text-slate-500 mt-1">${item.term.zh}</div>` : ''}
+                                ${currentLang === 'both' ? `<div class="text-sm font-bold text-[#1E4B7C] mt-1">${item.term.zh}</div>` : ''}
                             </div>
 
-                            <div class="text-xs text-indigo-600 font-semibold bg-white/80 backdrop-blur px-4 py-1.5 rounded-full border border-indigo-200 shadow-sm flex items-center gap-1.5">
+                            <div class="text-xs text-[#1E4B7C] font-semibold bg-white/80 backdrop-blur px-4 py-1.5 rounded-full border border-[#1E4B7C]/20 shadow-sm flex items-center gap-1.5">
                                 <i class="fa-solid fa-arrows-rotate"></i> Tap card or spacebar to flip
                             </div>
                         </div>
 
-                        <!-- BACK -->
-                        <div class="backface-hidden rotate-y-180 absolute inset-0 bg-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-indigo-500 shadow-xl overflow-hidden">
+                        <!-- BACK (NO VOCAB TERM - Test recall) -->
+                        <div class="backface-hidden rotate-y-180 absolute inset-0 bg-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-[#7C162D] shadow-xl overflow-hidden">
                             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <div>
-                                    <h4 class="font-black text-lg text-indigo-900">
-                                        ${item.term.en}
-                                    </h4>
-                                    <span class="text-xs text-slate-400">${item.term.zh}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-8 h-8 rounded-full bg-[#fdf2f4] text-[#7C162D] flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-question"></i>
+                                    </span>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-slate-800">What is this concept?</h4>
+                                        <span class="text-[11px] text-slate-400">Read the definition and guess the term</span>
+                                    </div>
                                 </div>
-                                <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100 uppercase">
-                                    Definition & Example
+                                <span class="text-[10px] font-bold text-[#1E4B7C] bg-[#f0f6fc] px-2.5 py-1 rounded-full border border-[#1E4B7C]/20 uppercase">
+                                    ${item.category}
                                 </span>
                             </div>
 
@@ -1026,11 +1040,15 @@
                             </div>
 
                             <!-- Example -->
-                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-xs text-slate-600">
-                                <span class="font-bold text-indigo-700 flex items-center gap-1 mb-1">
-                                    <i class="fa-solid fa-terminal"></i> ${currentLang === 'zh' ? '範例 (Example):' : 'Unit Example:'}
+                            <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs text-slate-600">
+                                <span class="font-bold text-[#1E4B7C] flex items-center gap-1.5 mb-1 text-xs">
+                                    <i class="fa-solid fa-terminal"></i> ${currentLang === 'zh' ? '範例提示 (Example Clue):' : 'Unit Clue / Example:'}
                                 </span>
                                 <div>${exContent}</div>
+                            </div>
+
+                            <div class="text-[11px] text-slate-400 text-center pt-1 font-medium">
+                                Press Spacebar or click card to verify your answer
                             </div>
                         </div>
 
@@ -1042,7 +1060,6 @@
         function toggleCardFlip(id, isFromFocus = false) {
             flippedCardMap[id] = !flippedCardMap[id];
             
-            // Check DOM element
             const innerCard = document.getElementById(`card-inner-${id}`);
             if (innerCard) {
                 if (flippedCardMap[id]) {
@@ -1071,7 +1088,7 @@
         function toggleFlipAll() {
             isAllFlipped = !isAllFlipped;
             const label = document.getElementById('flipAllLabel');
-            label.textContent = isAllFlipped ? "Flip to Terms" : "Flip All";
+            label.textContent = isAllFlipped ? "Flip to Terms" : "Flip to Definitions";
 
             filteredVocabList.forEach(item => {
                 flippedCardMap[item.id] = isAllFlipped;
@@ -1091,7 +1108,6 @@
         }
 
         function shuffleCards() {
-            // Fisher-Yates Shuffle Algorithm
             for (let i = filteredVocabList.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [filteredVocabList[i], filteredVocabList[j]] = [filteredVocabList[j], filteredVocabList[i]];
@@ -1099,10 +1115,9 @@
             activeFocusIndex = 0;
             renderFlashcards();
             
-            // Brief visual shake animation on button
             const btn = event.currentTarget;
-            btn.classList.add('bg-indigo-50');
-            setTimeout(() => btn.classList.remove('bg-indigo-50'), 300);
+            btn.classList.add('bg-[#f0f6fc]');
+            setTimeout(() => btn.classList.remove('bg-[#f0f6fc]'), 300);
         }
 
         function navFocusCard(dir) {
@@ -1134,21 +1149,18 @@
         function filterCategory(cat) {
             currentCategory = cat;
             
-            // Update pill styles
             document.querySelectorAll('.cat-pill').forEach(pill => {
-                pill.className = "cat-pill text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 shrink-0";
+                pill.className = "cat-pill text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 shrink-0";
             });
-            event.currentTarget.className = "cat-pill active text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-indigo-600 text-white border-indigo-600 shrink-0";
+            event.currentTarget.className = "cat-pill active text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-[#1E4B7C] text-white border-[#1E4B7C] shrink-0 shadow-sm";
 
             applyFilters();
         }
 
         function applyFilters() {
             filteredVocabList = VOCAB_DATABASE.filter(item => {
-                // Category match
                 const matchesCat = (currentCategory === 'all') || (item.category === currentCategory);
                 
-                // Search match (Term En, Term Zh, Definition En/Zh, Category)
                 const matchesQuery = !searchQuery || 
                     item.term.en.toLowerCase().includes(searchQuery) ||
                     item.term.zh.toLowerCase().includes(searchQuery) ||
@@ -1173,19 +1185,17 @@
         function setLanguage(lang) {
             currentLang = lang;
             
-            // Button styles
             const enBtn = document.getElementById('langEnBtn');
             const zhBtn = document.getElementById('langZhBtn');
             const bothBtn = document.getElementById('langBothBtn');
             
-            const activeClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-indigo-900 shadow";
-            const inactiveClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white";
+            const activeClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-[#7C162D] shadow";
+            const inactiveClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-white/80 hover:text-white";
 
             enBtn.className = (lang === 'en') ? activeClass : inactiveClass;
             zhBtn.className = (lang === 'zh') ? activeClass : inactiveClass;
             bothBtn.className = (lang === 'both') ? activeClass : inactiveClass;
 
-            // Update Statement of Inquiry header text
             const soiEl = document.getElementById('soiText');
             if (lang === 'zh') {
                 soiEl.textContent = '「真實世界現象可以被模擬為簡化的循環。」';
@@ -1210,8 +1220,8 @@
             const flashcardsView = document.getElementById('flashcardsView');
             const flashcardToolbar = document.getElementById('flashcardToolbar');
 
-            const activeClass = "px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-indigo-500 text-white shadow";
-            const inactiveClass = "px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white";
+            const activeClass = "px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-[#1E4B7C] shadow";
+            const inactiveClass = "px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-white/80 hover:text-white";
 
             if (mode === 'list') {
                 listBtn.className = activeClass;
@@ -1238,20 +1248,19 @@
             const focusBtn = document.getElementById('layoutFocusBtn');
 
             if (layout === 'grid') {
-                gridBtn.className = "p-1.5 text-xs rounded bg-white text-indigo-600 shadow-sm";
-                focusBtn.className = "p-1.5 text-xs rounded text-slate-500 hover:text-indigo-600";
+                gridBtn.className = "p-1.5 text-xs rounded bg-white text-[#1E4B7C] shadow-sm";
+                focusBtn.className = "p-1.5 text-xs rounded text-slate-500 hover:text-[#1E4B7C]";
                 gridContainer.classList.remove('hidden');
                 focusContainer.classList.add('hidden');
             } else {
-                focusBtn.className = "p-1.5 text-xs rounded bg-white text-indigo-600 shadow-sm";
-                gridBtn.className = "p-1.5 text-xs rounded text-slate-500 hover:text-indigo-600";
+                focusBtn.className = "p-1.5 text-xs rounded bg-white text-[#1E4B7C] shadow-sm";
+                gridBtn.className = "p-1.5 text-xs rounded text-slate-500 hover:text-[#1E4B7C]";
                 gridContainer.classList.add('hidden');
                 focusContainer.classList.remove('hidden');
                 renderFocusCard();
             }
         }
 
-        // Keyboard shortcuts for Flashcard Study Focus Mode
         document.addEventListener('keydown', (e) => {
             if (currentViewMode === 'flashcards' && cardLayout === 'focus') {
                 if (e.code === 'ArrowRight') {
