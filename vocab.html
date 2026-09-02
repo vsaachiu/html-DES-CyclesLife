@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cycles of Life: Interactive Vocabulary & Flashcards</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['"Fira Code"', 'Consolas', 'Monaco', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter & Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* 3D Flip Card Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .preserve-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* SOI Term highlighting */
+        .soi-highlight {
+            background-color: rgba(99, 102, 241, 0.12);
+            color: #4338ca;
+            padding: 0.1rem 0.35rem;
+            border-radius: 0.3rem;
+            font-weight: 700;
+            border-bottom: 2px solid #818cf8;
+        }
+
+        /* Inline Code styling */
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: #f1f5f9;
+            color: #d946ef;
+            padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem;
+            font-size: 0.88em;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Global Header -->
+    <header class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-700 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                
+                <!-- Title & Meta -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-xl shadow-inner shrink-0">
+                        <i class="fa-solid fa-microchip text-yellow-300"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs uppercase font-extrabold tracking-wider bg-indigo-900/60 px-2 py-0.5 rounded text-indigo-200 border border-indigo-400/30">
+                                MYP Year 8 Design
+                            </span>
+                            <span class="text-xs text-indigo-200">The Cycles of Life • 生命的循環</span>
+                        </div>
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight">
+                            Interactive Concept & Vocabulary Explorer
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Global Controls: Language & Mode Switches -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 self-end md:self-auto">
+                    
+                    <!-- Language Selector Toggle -->
+                    <div class="bg-indigo-950/60 p-1 rounded-xl border border-white/15 flex items-center shadow-inner">
+                        <button id="langEnBtn" onclick="setLanguage('en')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-indigo-900 shadow">
+                            <span>🇬🇧</span> <span class="hidden sm:inline">English</span>
+                        </button>
+                        <button id="langZhBtn" onclick="setLanguage('zh')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white">
+                            <span>🇭🇰</span> <span>繁體中文</span>
+                        </button>
+                        <button id="langBothBtn" onclick="setLanguage('both')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white">
+                            <span>🌐</span> <span class="hidden sm:inline">Dual</span>
+                        </button>
+                    </div>
+
+                    <!-- View Mode Toggle: Glossary List vs Flash Cards -->
+                    <div class="bg-indigo-950/60 p-1 rounded-xl border border-white/15 flex items-center shadow-inner">
+                        <button id="modeListBtn" onclick="setViewMode('list')" class="px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-indigo-500 text-white shadow">
+                            <i class="fa-solid fa-book-open"></i> <span>Glossary</span>
+                        </button>
+                        <button id="modeFlashBtn" onclick="setViewMode('flashcards')" class="px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white">
+                            <i class="fa-solid fa-layer-group"></i> <span>Flash Cards</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statement of Inquiry Banner -->
+            <div class="mt-3 pt-3 border-t border-indigo-500/40 flex items-center justify-between text-xs sm:text-sm text-indigo-100 flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-yellow-300 flex items-center gap-1">
+                        <i class="fa-solid fa-quote-left"></i> SOI:
+                    </span>
+                    <span id="soiText">"Real world phenomena can be simulated as simplified cycles."</span>
+                </div>
+                <div class="text-[11px] bg-white/10 px-2 py-0.5 rounded text-indigo-200">
+                    <span id="termCounter">26</span> terms loaded
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Control Toolbar (Sticky Sub-nav) -->
+    <section class="bg-white border-b border-slate-200 sticky top-[98px] md:top-[85px] z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+            
+            <!-- Left: Search and Category Filter -->
+            <div class="flex flex-wrap items-center gap-2 flex-1">
+                <!-- Search Input -->
+                <div class="relative min-w-[200px] flex-1 sm:flex-initial sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        oninput="handleSearch(this.value)"
+                        placeholder="Search term, keyword, or code..." 
+                        class="w-full pl-8 pr-8 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-slate-50 transition"
+                    >
+                    <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-circle-xmark text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                    <button onclick="filterCategory('all')" class="cat-pill active text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-indigo-600 text-white border-indigo-600 shrink-0">
+                        All
+                    </button>
+                    <button onclick="filterCategory('Logic & Code')" class="cat-pill text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 shrink-0">
+                        Logic & Code
+                    </button>
+                    <button onclick="filterCategory('Systems & Hardware')" class="cat-pill text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 shrink-0">
+                        Systems & Micro:bit
+                    </button>
+                    <button onclick="filterCategory('Thinking & Design')" class="cat-pill text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 shrink-0">
+                        Design & Modelling
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Flashcard Action Buttons (Visible only in Flashcard Mode) -->
+            <div id="flashcardToolbar" class="hidden flex items-center gap-2 justify-end">
+                <!-- Shuffle Button -->
+                <button onclick="shuffleCards()" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="fa-solid fa-shuffle text-indigo-500"></i>
+                    <span>Shuffle</span>
+                </button>
+
+                <!-- Flip All Button -->
+                <button id="flipAllBtn" onclick="toggleFlipAll()" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="fa-solid fa-arrows-rotate text-indigo-600"></i>
+                    <span id="flipAllLabel">Flip All</span>
+                </button>
+
+                <!-- Study Focus View Mode Toggle -->
+                <div class="bg-slate-100 p-0.5 rounded-lg border border-slate-200 flex items-center">
+                    <button id="layoutGridBtn" onclick="setCardLayout('grid')" title="Grid View" class="p-1.5 text-xs rounded bg-white text-indigo-600 shadow-sm">
+                        <i class="fa-solid fa-table-cells"></i>
+                    </button>
+                    <button id="layoutFocusBtn" onclick="setCardLayout('focus')" title="1-by-1 Focus Mode" class="p-1.5 text-xs rounded text-slate-500 hover:text-indigo-600">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Main Content Stage -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+        
+        <!-- View A: Standard Glossary List View -->
+        <div id="glossaryView" class="space-y-4">
+            <!-- Grid of Definitions -->
+            <div id="glossaryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Injected via JavaScript -->
+            </div>
+            
+            <!-- Empty Search State -->
+            <div id="emptySearchNotice" class="hidden py-16 text-center">
+                <div class="w-16 h-16 rounded-full bg-indigo-50 text-indigo-400 mx-auto flex items-center justify-center text-2xl mb-3">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-800">No matching vocabulary found</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Try typing a different keyword, such as "loop", "modulus", "餘數", or clearing your filters.</p>
+                <button onclick="clearSearch()" class="mt-4 px-4 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 transition">
+                    Reset Search
+                </button>
+            </div>
+        </div>
+
+        <!-- View B: Flash Cards Mode View -->
+        <div id="flashcardsView" class="hidden">
+            
+            <!-- 1-by-1 Focus Carousel Mode (Hidden by default, toggled via layout) -->
+            <div id="focusModeContainer" class="hidden max-w-xl mx-auto mb-8">
+                <div class="flex items-center justify-between text-xs text-slate-500 font-semibold mb-2 px-1">
+                    <span id="focusCardCounter">Card 1 of 26</span>
+                    <span>Use <kbd class="px-1.5 py-0.5 bg-slate-200 rounded border border-slate-300 font-mono">←</kbd> <kbd class="px-1.5 py-0.5 bg-slate-200 rounded border border-slate-300 font-mono">→</kbd> keys or swipe</span>
+                </div>
+
+                <!-- Single Focus Card Container -->
+                <div id="focusCardSlot" class="w-full">
+                    <!-- Injected dynamically -->
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-center gap-4 mt-4">
+                    <button onclick="navFocusCard(-1)" class="w-10 h-10 rounded-full bg-white border border-slate-300 shadow-sm hover:bg-slate-50 text-slate-700 flex items-center justify-center transition active:scale-90">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <button onclick="toggleSingleFocusFlip()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md hover:bg-indigo-700 active:scale-95 transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Click to Flip</span>
+                    </button>
+                    <button onclick="navFocusCard(1)" class="w-10 h-10 rounded-full bg-white border border-slate-300 shadow-sm hover:bg-slate-50 text-slate-700 flex items-center justify-center transition active:scale-90">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Flash Card Grid Mode -->
+            <div id="flashcardGridContainer">
+                <div class="mb-3 flex items-center justify-between text-xs text-slate-500 px-1">
+                    <span class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-hand-pointer text-indigo-500"></i>
+                        <span>Click any card to flip between <strong>Term</strong> and <strong>Definition</strong>.</span>
+                    </span>
+                    <span class="hidden sm:inline text-slate-400">Card count: <strong id="cardGridCount">26</strong></span>
+                </div>
+                <div id="flashcardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-medium text-slate-700">
+                MYP Year 8 Design • Scientific & Technical Innovation
+            </p>
+            <p class="text-slate-400">
+                Key Concept: <strong>Systems</strong> | Related Concepts: <strong>Cycles</strong> & <strong>Simulations</strong>
+            </p>
+            <p class="text-[11px] text-slate-400">
+                Designed for Microsoft MakeCode & Micro:bit JavaScript Simulation Unit.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * Comprehensive Vocabulary JSON Dataset
+         * Readily extensible and modifiable for future lessons.
+         */
+        const VOCAB_DATABASE = [
+            {
+                id: "abstraction",
+                category: "Thinking & Design",
+                term: {
+                    en: "Abstraction",
+                    zh: "Abstraction (抽象化)"
+                },
+                definition: {
+                    en: "The computational thinking technique of filtering out unnecessary <span class='soi-highlight'>real-world</span> details to focus strictly on the essential characteristics needed to solve a problem or construct a <span class='soi-highlight'>model</span>. This allows programmers to represent complex <span class='soi-highlight'>real-world phenomena</span> by <span class='soi-highlight'>simplifying</span> them down to core variables and rules for our <span class='soi-highlight'>simulation</span>.",
+                    zh: "一種計算思維方法，透過篩選並去除不必要的<span class='soi-highlight'>真實世界 (real-world)</span> 細節，只專注於解決問題或構建<span class='soi-highlight'>模型 (model)</span> 所需的核心特徵。這讓程式設計師能夠將複雜的<span class='soi-highlight'>真實世界現象 (real-world phenomena)</span> <span class='soi-highlight'>簡化 (simplified)</span> 成<span class='soi-highlight'>模擬 (simulation)</span> 中的核心變數與運行規則。"
+                },
+                example: {
+                    en: "Representing the biological needs of a living pet with just two numeric variables (<code>energy</code> and <code>awake</code>), rather than simulating cells, organs, or muscles.",
+                    zh: "只用兩個數值變數（<code>energy</code> 和 <code>awake</code>）來表現寵物的生存需求，而不是去模擬真實的細胞、器官或肌肉組織。"
+                }
+            },
+            {
+                id: "algorithm",
+                category: "Thinking & Design",
+                term: {
+                    en: "Algorithm",
+                    zh: "Algorithm (演算法 / 運算步驟)"
+                },
+                definition: {
+                    en: "A precise, step-by-step set of ordered instructions or rules designed to complete a specific task, process data, or drive the timed <span class='soi-highlight'>cycles</span> of a <span class='soi-highlight'>simulation</span>.",
+                    zh: "一組精確、按部就班的指令或規則，用來完成特定任務、處理資料，或驅動<span class='soi-highlight'>模擬 (simulation)</span> 中有規律的時間<span class='soi-highlight'>循環 (cycles)</span>。"
+                },
+                example: {
+                    en: "The sequence inside the timer loop that reads the current <code>tick</code>, calculates the modulus, updates the <code>energy</code> variable, and decides whether to display a heart icon.",
+                    zh: "在計時迴圈內的運算步驟：讀取當前的 <code>tick</code> 數值、計算餘數、更新 <code>energy</code> 變數，並決定畫面上是否顯示心形圖案。"
+                }
+            },
+            {
+                id: "boolean",
+                category: "Logic & Code",
+                term: {
+                    en: "Boolean",
+                    zh: "Boolean (布爾值 / 真假值)"
+                },
+                definition: {
+                    en: "A logical data type that can hold only one of two mutually exclusive values: <code>true</code> or <code>false</code> (often represented numerically as 1 or 0), used within a <span class='soi-highlight'>model</span> to track whether specific <span class='soi-highlight'>real-world</span> conditions or states are active.",
+                    zh: "一種邏輯資料類型，只能存放兩種互斥的數值之一：<code>true</code>（真）或 <code>false</code>（假）（在程式中常以 1 或 0 代表）。在<span class='soi-highlight'>模型 (model)</span> 中用來記錄特定<span class='soi-highlight'>真實世界 (real-world)</span> 狀態或條件是否正在發生。"
+                },
+                example: {
+                    en: "Checking conditional expressions like <code>(alive == 1)</code> or <code>(energy <= 0)</code> to verify whether a system condition is true.",
+                    zh: "檢查條件語句如 <code>(alive == 1)</code> 或 <code>(energy <= 0)</code>，以判斷系統某個狀態是真還是假。"
+                }
+            },
+            {
+                id: "bug",
+                category: "Logic & Code",
+                term: {
+                    en: "Bug",
+                    zh: "Bug (程式錯誤)"
+                },
+                definition: {
+                    en: "An error, flaw, or mistake within a computer program that causes it to produce an incorrect result, crash, or disrupt the intended <span class='soi-highlight'>cycle</span> of a <span class='soi-highlight'>simulation</span>.",
+                    zh: "電腦程式中的錯誤或漏洞，會導致程式產生錯誤結果、當機，或破壞<span class='soi-highlight'>模擬 (simulation)</span> 預期的運作<span class='soi-highlight'>循環 (cycle)</span>。"
+                },
+                example: {
+                    en: "Forgetting to increment <code>tick</code> inside <code>loops.everyInterval</code>, causing <code>tick % 4</code> to stay stuck at 0 and preventing the heartbeat animation from cycling.",
+                    zh: "忘記在 <code>loops.everyInterval</code> 內為 <code>tick</code> 累加數值，導致 <code>tick % 4</code> 永遠停留在 0，使得心跳動畫完全無法順利進行循環變化。"
+                }
+            },
+            {
+                id: "comments",
+                category: "Logic & Code",
+                term: {
+                    en: "Comments",
+                    zh: "Comments (程式註釋)"
+                },
+                definition: {
+                    en: "Non-executable explanatory notes written directly inside source code (using markers like <code>//</code>) that the computer ignores, written to explain how the code functions and how a <span class='soi-highlight'>real-world</span> process has been <span class='soi-highlight'>simplified</span> into program logic.",
+                    zh: "直接寫在程式原始碼中（使用標記如 <code>//</code>）、供人閱讀但電腦會自動忽略的說明文字。用來解釋程式碼如何運作，以及<span class='soi-highlight'>真實世界 (real-world)</span> 的運作過程是如何被<span class='soi-highlight'>簡化 (simplified)</span> 成程式邏輯的。"
+                },
+                example: {
+                    en: "Adding <code>// Main loop running every 500ms</code> and <code>// Variable to track cycle steps</code> to make code easy for classmates to follow.",
+                    zh: "在程式中加上 <code>// Main loop running every 500ms</code> 或 <code>// Variable to track cycle steps</code>，讓閱讀你 Build Guide 的同學能輕鬆看懂你的程式。"
+                }
+            },
+            {
+                id: "conditional",
+                category: "Logic & Code",
+                term: {
+                    en: "Conditional",
+                    zh: "Conditional (條件判斷語句)"
+                },
+                definition: {
+                    en: "A programming construct (<code>if</code>, <code>else if</code>, <code>else</code>) that directs the computer to execute certain blocks of code only when specific criteria evaluate to true, allowing a <span class='soi-highlight'>simulation</span> to react dynamically to changing states and <span class='soi-highlight'>cycles</span>.",
+                    zh: "一種程式結構（<code>if</code>、<code>else if</code>、<code>else</code>），讓電腦只有在指定條件成立（為真）時才執行特定程式區塊，使<span class='soi-highlight'>模擬 (simulation)</span> 能根據不斷變化的狀態與<span class='soi-highlight'>循環 (cycles)</span> 做出動態反應。"
+                },
+                example: {
+                    en: "Evaluating <code>if (alive && tick % 8 == 0)</code> to determine whether the simulation should toggle between breathing in and breathing out.",
+                    zh: "判斷 <code>if (alive && tick % 8 == 0)</code>，藉此決定模擬系統當前應該切換成吸氣還是呼氣動作。"
+                }
+            },
+            {
+                id: "cycle",
+                category: "Thinking & Design",
+                term: {
+                    en: "Cycle",
+                    zh: "Cycle (循環 / 週期)"
+                },
+                definition: {
+                    en: "A sequence of operations, states, or values that repeats continuously in a regular, predictable pattern and returns to its starting point, frequently used to represent repeating <span class='soi-highlight'>real-world phenomena</span> in a <span class='soi-highlight'>simplified</span> computational <span class='soi-highlight'>model</span>.",
+                    zh: "一連串按照固定、可預測的規律不斷重複並回到起點的運作、狀態或數值序列。常用於在<span class='soi-highlight'>簡化 (simplified)</span> 的計算<span class='soi-highlight'>模型 (model)</span> 中，表現會重複發生的<span class='soi-highlight'>真實世界現象 (real-world phenomena)</span>。"
+                },
+                example: {
+                    en: "The alternating heartbeat cycle switching back and forth between a big heart and a small heart every tick, or a modulus timer that cycles through 0, 1, 2, 3.",
+                    zh: "每個 tick 在大愛心與小愛心之間來回切換的心跳循環，或是透過求餘數計算在 0, 1, 2, 3 之間不斷循環往復的計時器。"
+                }
+            },
+            {
+                id: "debugging",
+                category: "Logic & Code",
+                term: {
+                    en: "Debugging",
+                    zh: "Debugging (除錯 / 排查錯誤)"
+                },
+                definition: {
+                    en: "The systematic routine of identifying, analysing, isolating, and fixing bugs or unintended logic behaviours within source code or hardware setups to ensure a <span class='soi-highlight'>simulation</span> faithfully executes its intended <span class='soi-highlight'>cycles</span>.",
+                    zh: "有系統地找出、分析、隔離並修正原始碼或硬體接線中錯誤（bugs）的過程，確保<span class='soi-highlight'>模擬 (simulation)</span> 能完全依照預期的<span class='soi-highlight'>循環 (cycles)</span> 順暢運作。"
+                },
+                example: {
+                    en: "Using <code>serial.writeLine(\"T:\" + tick + \" tick % 4:\" + (tick % 4))</code> to view real-time data in the serial console and verify why a conditional failed to trigger.",
+                    zh: "利用 <code>serial.writeLine(\"T:\" + tick + \" tick % 4:\" + (tick % 4))</code> 在序列控制台即時查看數據輸出，找出條件語句為何沒有正常觸發的原因。"
+                }
+            },
+            {
+                id: "double",
+                category: "Logic & Code",
+                term: {
+                    en: "Double (Floating-Point)",
+                    zh: "Double (浮點數 / 小數)"
+                },
+                definition: {
+                    en: "A numeric data type capable of representing fractional numbers containing decimal points, offering mathematical precision when a <span class='soi-highlight'>model</span> cannot be completely <span class='soi-highlight'>simplified</span> into whole integers.",
+                    zh: "一種能夠表示帶有小數點的數值資料類型。當一個<span class='soi-highlight'>模型 (model)</span> 無法完全<span class='soi-highlight'>簡化 (simplified)</span> 成整數運算時，浮點數能提供更高的數學精確度。"
+                },
+                example: {
+                    en: "Calculating smooth LED dimming increments, such as <code>(240 - 40) / 8</code> which evaluates to a decimal step of 25.0.",
+                    zh: "計算平滑漸變的 LED 亮度變化，例如 <code>(240 - 40) / 8</code> 計算出每一步微調 25.0。"
+                }
+            },
+            {
+                id: "flowchart",
+                category: "Thinking & Design",
+                term: {
+                    en: "Flowchart",
+                    zh: "Flowchart (流程圖)"
+                },
+                definition: {
+                    en: "A standardised diagram that visually maps out the step-by-step sequential logic, processes, decision points, and repeating <span class='soi-highlight'>cycles</span> of an algorithm before building the programmatic <span class='soi-highlight'>model</span>.",
+                    zh: "一種標準化的圖表，在實際建立程式<span class='soi-highlight'>模型 (model)</span> 之前，用圖形視覺化地呈現出演算法的步驟順序、處理過程、判斷分支以及重複的<span class='soi-highlight'>循環 (cycles)</span>。"
+                },
+                example: {
+                    en: "Drawing a decision diamond that checks <code>tick % 4 == 0</code> with an arrow pointing to \"Show Big Heart\" if true, and \"Show Small Heart\" if false.",
+                    zh: "畫一個菱形判斷框檢查 <code>tick % 4 == 0</code>，若條件為真則箭頭指向「顯示大愛心」，若為假則指向「顯示小愛心」。"
+                }
+            },
+            {
+                id: "function",
+                category: "Logic & Code",
+                term: {
+                    en: "Function",
+                    zh: "Function (函式)"
+                },
+                definition: {
+                    en: "A named, reusable block of code designed to carry out a specific sub-task or sub-<span class='soi-highlight'>cycle</span> whenever called by name, helping programmers deconstruct complex <span class='soi-highlight'>real-world phenomena</span> into clean, modular routines.",
+                    zh: "一段有名稱、可重複呼叫的獨立程式碼區塊，每次以名稱呼叫時就會執行特定的子任務或子<span class='soi-highlight'>循環 (sub-cycle)</span>。這有助於程式設計師將複雜的<span class='soi-highlight'>真實世界現象 (real-world phenomena)</span> 拆解成乾淨、模組化的步驟。"
+                },
+                example: {
+                    en: "Creating modular functions such as <code>breathe()</code>, <code>heartBeat()</code>, and <code>useEnergy()</code> so the main execution loop remains tidy.",
+                    zh: "建立如 <code>breathe()</code>、<code>heartBeat()</code> 和 <code>useEnergy()</code> 等模組化函式，讓主迴圈程式保持整潔清晰。"
+                }
+            },
+            {
+                id: "increment",
+                category: "Logic & Code",
+                term: {
+                    en: "Increment",
+                    zh: "Increment (遞增 / 增加數值)"
+                },
+                definition: {
+                    en: "The operation of increasing the numeric value of a variable by a specific amount (most commonly by 1), often used to advance virtual time or count steps through a <span class='soi-highlight'>cycle</span> within a <span class='soi-highlight'>simulation</span>.",
+                    zh: "將變數的數值增加特定數值（最常見為每次加 1）的操作。常用於推進虛擬時間，或是在<span class='soi-highlight'>模擬 (simulation)</span> 中計算<span class='soi-highlight'>循環 (cycle)</span> 已經進行了多少步驟。"
+                },
+                example: {
+                    en: "Running <code>tick = tick + 1;</code> (or <code>tick += 1;</code>) every time the timer interval executes to advance time.",
+                    zh: "每次計時區間觸發時執行 <code>tick = tick + 1;</code>（或 <code>tick += 1;</code>）來推進時間計數。"
+                }
+            },
+            {
+                id: "input",
+                category: "Systems & Hardware",
+                term: {
+                    en: "Input",
+                    zh: "Input (輸入)"
+                },
+                definition: {
+                    en: "External data, electrical signals, or user actions received by a computer system that trigger processing or cause a <span class='soi-highlight'>simulated</span> system to change its internal state in response to the <span class='soi-highlight'>real world</span>.",
+                    zh: "電腦系統接收到的外部資料、電子訊號或使用者操作。這些輸入會觸發運算處理，或讓<span class='soi-highlight'>模擬 (simulated)</span> 系統改變其內部狀態以回應<span class='soi-highlight'>真實世界 (real world)</span> 的互動。"
+                },
+                example: {
+                    en: "Pressing <strong>Button A</strong> to check the pet's feeling or pressing <strong>Button B</strong> to trigger the sleep state.",
+                    zh: "按下 <strong>Button A</strong> 檢查寵物當前的心情，或按下 <strong>Button B</strong> 讓寵物進入睡眠狀態。"
+                }
+            },
+            {
+                id: "integer",
+                category: "Logic & Code",
+                term: {
+                    en: "Integer",
+                    zh: "Integer (整數)"
+                },
+                definition: {
+                    en: "A fundamental data type representing whole numbers without fractions or decimal points, including positive numbers, negative numbers, and zero, ideal for counting ticks, tracking status points, and running <span class='soi-highlight'>simplified</span> timing <span class='soi-highlight'>cycles</span>.",
+                    zh: "一種基礎資料類型，表示沒有小數點的完整數字（包括正整數、負整數與零）。非常適合用來計數 tick、記錄狀態點數以及執行<span class='soi-highlight'>簡化 (simplified)</span> 的計時<span class='soi-highlight'>循環 (cycles)</span>。"
+                },
+                example: {
+                    en: "Storing whole values like <code>let tick = 0;</code> or <code>let pauseDisplayFor = 8;</code>.",
+                    zh: "儲存純整數數值，如 <code>let tick = 0;</code> 或 <code>let pauseDisplayFor = 8;</code>。"
+                }
+            },
+            {
+                id: "javascript",
+                category: "Logic & Code",
+                term: {
+                    en: "JavaScript",
+                    zh: "JavaScript"
+                },
+                definition: {
+                    en: "A high-level, text-based programming language widely used across the web and supported inside Microsoft MakeCode to write the algorithms, variables, and logic that bring a <span class='soi-highlight'>simulation model</span> to life.",
+                    zh: "一種廣泛應用於網頁開發的文字型高階程式語言，也是 Microsoft MakeCode 支援的語言之一。我們用它來編寫驅動<span class='soi-highlight'>模擬模型 (simulation model)</span> 的演算法、變數與邏輯架構。"
+                },
+                example: {
+                    en: "Switching from visual drag-and-drop blocks to the text editor tab in MakeCode to directly write statements like <code>let tick = 0;</code>.",
+                    zh: "在 MakeCode 中從圖形積木切換至文字編輯器分頁，直接編寫如 <code>let tick = 0;</code> 的程式指令。"
+                }
+            },
+            {
+                id: "loop",
+                category: "Logic & Code",
+                term: {
+                    en: "Loop",
+                    zh: "Loop (迴圈)"
+                },
+                definition: {
+                    en: "A control structure that repeatedly executes a block of code instructions either indefinitely or until a specified condition is satisfied, providing the timing heartbeat that drives repetitive <span class='soi-highlight'>cycles</span> in a <span class='soi-highlight'>simulation</span>.",
+                    zh: "一種控制結構，會重複執行某段程式碼，直到滿足特定條件或無休止地運行。它為<span class='soi-highlight'>模擬 (simulation)</span> 提供了定時的心跳節奏，驅動各種重複發生的<span class='soi-highlight'>循環 (cycles)</span>。"
+                },
+                example: {
+                    en: "Using <code>loops.everyInterval(500, function () { ... })</code> to repeatedly execute heartbeat and energy logic every half-second.",
+                    zh: "使用 <code>loops.everyInterval(500, function () { ... })</code> 讓程式每半秒固定重複執行一次心跳與能量消耗邏輯。"
+                }
+            },
+            {
+                id: "microbit",
+                category: "Systems & Hardware",
+                term: {
+                    en: "Micro:bit",
+                    zh: "Micro:bit"
+                },
+                definition: {
+                    en: "An educational programmable microcontroller board equipped with a 5×5 LED display matrix, input buttons, motion sensors, and wireless communication, used to run physical computing prototypes and <span class='soi-highlight'>simulated</span> systems.",
+                    zh: "一款微型可程式化微控制器教育板，內建 5×5 LED 矩陣螢幕、按鈕、動態感測器與無線通訊功能，用於運行實體運算專案與各種<span class='soi-highlight'>模擬 (simulated)</span> 系統。"
+                },
+                example: {
+                    en: "The physical hardware (and MakeCode simulator) that executes our JavaScript code, listens for button presses, and displays the heart animations.",
+                    zh: "實際運行我們 JavaScript 程式碼、偵測按鈕點擊並在螢幕上顯示心跳動畫的微型硬體（或 MakeCode 模擬器）。"
+                }
+            },
+            {
+                id: "modulus",
+                category: "Logic & Code",
+                term: {
+                    en: "Modulus (%)",
+                    zh: "Modulus (求餘數運算 / %)"
+                },
+                definition: {
+                    en: "A mathematical operator (represented by <code>%</code>) that calculates and returns the remainder left over after dividing one integer by another, essential for creating predictable, repeating numerical <span class='soi-highlight'>cycles</span> to <span class='soi-highlight'>model</span> periodic <span class='soi-highlight'>real-world phenomena</span>.",
+                    zh: "一種數學運算子（在程式中以 <code>%</code> 表示），用來計算兩整數相除後剩餘的「餘數」。對於建立具規律性、可預測的數值<span class='soi-highlight'>循環 (cycles)</span> 來建立<span class='soi-highlight'>真實世界現象 (real-world phenomena)</span> 的<span class='soi-highlight'>模型 (model)</span> 非常關鍵。"
+                },
+                example: {
+                    en: "Using <code>tick % 4 == 0</code> to check whether the tick counter is an exact multiple of 4, triggering an action predictably once every 4 ticks.",
+                    zh: "使用 <code>tick % 4 == 0</code> 來檢查 <code>tick</code> 計數是否為 4 的倍數，進而精準地每隔 4 個 tick 就觸發一次動作。"
+                }
+            },
+            {
+                id: "output",
+                category: "Systems & Hardware",
+                term: {
+                    en: "Output",
+                    zh: "Output (輸出)"
+                },
+                definition: {
+                    en: "The observable information, physical action, or visual/audio signals produced by a computer system, allowing users to observe and interact with the current state of the <span class='soi-highlight'>simulation</span> as it reflects <span class='soi-highlight'>real-world</span> changes.",
+                    zh: "電腦系統產生的可觀察資訊、動作、圖像或聲音訊號。讓使用者能夠觀察並與<span class='soi-highlight'>模擬 (simulation)</span> 的當前狀態互動，反映出系統對應於<span class='soi-highlight'>真實世界 (real world)</span> 的變化。"
+                },
+                example: {
+                    en: "Displaying <code>IconNames.Heart</code> on the 5×5 LED grid or sending status telemetry (<code>T:4 tick % 4:0</code>) out to the serial console.",
+                    zh: "在 5×5 LED 螢幕上顯示 <code>IconNames.Heart</code>，或是將即時狀態數據（如 <code>T:4 tick % 4:0</code>）傳送到序列除錯控制台。"
+                }
+            },
+            {
+                id: "pseudocode",
+                category: "Thinking & Design",
+                term: {
+                    en: "Pseudocode",
+                    zh: "Pseudocode (偽代碼)"
+                },
+                definition: {
+                    en: "An informal, human-readable outline of an algorithm written in structured plain English that sketches out <span class='soi-highlight'>simplified</span> program logic and state <span class='soi-highlight'>cycles</span> before translating them into formal programming syntax.",
+                    zh: "用簡潔、人類易懂的結構化白話文字勾勒出的演算法草稿。在正式轉換成程式碼語法前，先用它來梳理出<span class='soi-highlight'>簡化 (simplified)</span> 的程式邏輯與狀態<span class='soi-highlight'>循環 (cycles)</span>。"
+                },
+                example: {
+                    en: "Writing <code>IF tick is even THEN show Big Heart ELSE show Small Heart</code> on paper before writing the JavaScript code blocks.",
+                    zh: "在寫 JavaScript 之前，先在紙上寫下：「如果 tick 是雙數，顯示大愛心；否則，顯示小愛心」。"
+                }
+            },
+            {
+                id: "simplify",
+                category: "Thinking & Design",
+                term: {
+                    en: "Simplify",
+                    zh: "Simplify (簡化)"
+                },
+                definition: {
+                    en: "The computational design process of deconstructing complex <span class='soi-highlight'>real-world phenomena</span> down to their most fundamental rules, states, and <span class='soi-highlight'>cycles</span>, removing unnecessary details so they can be effectively <span class='soi-highlight'>modelled</span> in code.",
+                    zh: "一種計算設計過程，將複雜的<span class='soi-highlight'>真實世界現象 (real-world phenomena)</span> 拆解並濃縮成最關鍵的核心規則、狀態與<span class='soi-highlight'>循環 (cycles)</span>，捨去不必要的細節，以便能在程式碼中有效地建立<span class='soi-highlight'>模型 (modelled)</span>。"
+                },
+                example: {
+                    en: "Reducing the complex biology of hunger and energy expenditure to an <code>energy</code> variable that decrements by 1 every two ticks, rather than programming cellular digestion.",
+                    zh: "將生物體複雜的飢餓與熱量消耗機制，簡化成一個每隔兩拍就扣減 1 點的 <code>energy</code> 變數，而不是去模擬細胞層級的消化吸收。"
+                }
+            },
+            {
+                id: "simulation",
+                category: "Thinking & Design",
+                term: {
+                    en: "Simulation",
+                    zh: "Simulation (模擬)"
+                },
+                definition: {
+                    en: "A computerised <span class='soi-highlight'>model</span> that mimics the behaviours, dynamic states, and rules of complex <span class='soi-highlight'>real-world phenomena</span> over time through structured mathematical and logical <span class='soi-highlight'>cycles</span>.",
+                    zh: "一種電腦化<span class='soi-highlight'>模型 (model)</span>，透過結構化的數學運算與邏輯<span class='soi-highlight'>循環 (cycles)</span>，隨時間推移重現出複雜<span class='soi-highlight'>真實世界現象 (real-world phenomena)</span> 的行為模式、動態狀態與規律。"
+                },
+                example: {
+                    en: "Building a Micro:bit program that models the biological heartbeat, breathing cycles, and energy decay of a living organism.",
+                    zh: "在 Micro:bit 上編寫程式，模擬生物的心跳節奏、呼吸循環與能量消耗過程。"
+                }
+            },
+            {
+                id: "state",
+                category: "Systems & Hardware",
+                term: {
+                    en: "State",
+                    zh: "State (狀態)"
+                },
+                definition: {
+                    en: "The condition, mode, or status of a system at an exact moment in time, determined by stored variable values that capture the <span class='soi-highlight'>simplified</span> attributes of the <span class='soi-highlight'>real-world</span> subject being <span class='soi-highlight'>simulated</span>.",
+                    zh: "系統在某一特定時間點下的情況、模式或現狀。由儲存在變數中的數值決定，反映出被<span class='soi-highlight'>模擬 (simulated)</span> 對象在<span class='soi-highlight'>真實世界 (real-world)</span> 中的<span class='soi-highlight'>簡化 (simplified)</span> 特徵。"
+                },
+                example: {
+                    en: "Whether the pet is currently <code>awake = 1</code>, <code>alive = 1</code>, or resting in a low-power mode with dimmed LEDs.",
+                    zh: "虛擬寵物目前是處於清醒 <code>awake = 1</code>、活著 <code>alive = 1</code>，或是處於 LED 暗屏的省電休眠狀態。"
+                }
+            },
+            {
+                id: "state_diagram",
+                category: "Thinking & Design",
+                term: {
+                    en: "State Change Diagram",
+                    zh: "State Change Diagram (狀態轉變圖)"
+                },
+                definition: {
+                    en: "A specialised diagram that visually maps out a <span class='soi-highlight'>model</span> by displaying its finite set of distinct states and the specific events, threshold conditions, or <span class='soi-highlight'>cycles</span> that cause transitions between them.",
+                    zh: "一種專門的圖表，透過視覺化方式展示一個<span class='soi-highlight'>模型 (model)</span> 的所有有限狀態，以及觸發系統在不同狀態與<span class='soi-highlight'>循環 (cycles)</span> 之間切換的特定事件或數值條件。"
+                },
+                example: {
+                    en: "A diagram showing transition arrows between three main circles—Awake, Asleep, and Dead—triggered by energy drops or button presses.",
+                    zh: "畫出三個主要圓圈——「清醒」、「睡眠」與「死亡」，並用箭頭標註由能量耗盡或按鈕點擊所觸發的狀態轉換條件。"
+                }
+            },
+            {
+                id: "string",
+                category: "Logic & Code",
+                term: {
+                    en: "String",
+                    zh: "String (字串 / 文字)"
+                },
+                definition: {
+                    en: "A sequence of alphanumeric characters, symbols, or text tokens enclosed inside quotation marks, used to display messages or output readable data about a <span class='soi-highlight'>simulation</span> to human users.",
+                    zh: "一串被包在引號內的字母、符號或文字片段。用來在螢幕上顯示訊息，或是向使用者輸出關於<span class='soi-highlight'>模擬 (simulation)</span> 運作狀況的文字讀數。"
+                },
+                example: {
+                    en: "The text label <code>\"T:\"</code> or <code>\"Tick: \"</code> inside <code>serial.writeLine(\"Tick: \" + tick)</code> used to print descriptive labels to the debug console.",
+                    zh: "<code>serial.writeLine(\"Tick: \" + tick)</code> 裡面的文字標籤 <code>\"T:\"</code> 或 <code>\"Tick: \"</code>，用來在除錯控制台中印出易讀的標籤。"
+                }
+            },
+            {
+                id: "variable",
+                category: "Logic & Code",
+                term: {
+                    en: "Variable",
+                    zh: "Variable (變數)"
+                },
+                definition: {
+                    en: "A named container or memory location in a computer program that holds a piece of data that can be inspected, updated, or manipulated as the <span class='soi-highlight'>simulation</span> progresses through its <span class='soi-highlight'>cycles</span>.",
+                    zh: "電腦程式中有命名的容器或記憶體儲存位置，用來存放可以在<span class='soi-highlight'>模擬 (simulation)</span> 推進各個<span class='soi-highlight'>循環 (cycles)</span> 期間被隨時讀取、更新或計算的數據資料。"
+                },
+                example: {
+                    en: "Declaring <code>let energy = 100;</code> to store the pet's remaining stamina throughout the simulation.",
+                    zh: "宣告 <code>let energy = 100;</code> 來記錄並儲存寵物在整個模擬過程中剩餘的體力值。"
+                }
+            }
+        ];
+
+        // App State
+        let currentLang = 'en';       // 'en', 'zh', 'both'
+        let currentViewMode = 'list';  // 'list', 'flashcards'
+        let currentCategory = 'all';  // 'all', 'Logic & Code', etc.
+        let searchQuery = '';
+        let cardLayout = 'grid';       // 'grid', 'focus'
+        let activeFocusIndex = 0;
+        let isAllFlipped = false;
+        
+        // Track individual card flip states in an object
+        let flippedCardMap = {};
+
+        // Filtered array cache
+        let filteredVocabList = [...VOCAB_DATABASE];
+
+        // Category Badges Colors
+        function getCategoryBadge(cat) {
+            switch(cat) {
+                case 'Logic & Code':
+                    return 'bg-purple-100 text-purple-800 border-purple-200';
+                case 'Systems & Hardware':
+                    return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                case 'Thinking & Design':
+                    return 'bg-amber-100 text-amber-800 border-amber-200';
+                default:
+                    return 'bg-slate-100 text-slate-800 border-slate-200';
+            }
+        }
+
+        function renderGlossaryList() {
+            const container = document.getElementById('glossaryGrid');
+            const emptyNotice = document.getElementById('emptySearchNotice');
+            
+            if (filteredVocabList.length === 0) {
+                container.innerHTML = '';
+                emptyNotice.classList.remove('hidden');
+                return;
+            }
+            
+            emptyNotice.classList.add('hidden');
+            
+            container.innerHTML = filteredVocabList.map((item, index) => {
+                const badgeStyle = getCategoryBadge(item.category);
+                
+                // Determine term heading
+                let termHtml = '';
+                let defHtml = '';
+                let exHtml = '';
+
+                if (currentLang === 'en') {
+                    termHtml = `<span class="text-indigo-900">${item.term.en}</span>`;
+                    defHtml = item.definition.en;
+                    exHtml = item.example.en;
+                } else if (currentLang === 'zh') {
+                    termHtml = `<span class="text-indigo-900">${item.term.zh}</span>`;
+                    defHtml = item.definition.zh;
+                    exHtml = item.example.zh;
+                } else {
+                    // Both
+                    termHtml = `<span class="text-indigo-900">${item.term.en}</span> <span class="text-sm font-semibold text-slate-500 block sm:inline">(${item.term.zh})</span>`;
+                    defHtml = `
+                        <div class="space-y-2">
+                            <div><span class="text-[10px] font-bold text-indigo-500 uppercase">EN:</span> ${item.definition.en}</div>
+                            <div class="pt-1 border-t border-slate-100"><span class="text-[10px] font-bold text-emerald-600 uppercase">中文:</span> ${item.definition.zh}</div>
+                        </div>
+                    `;
+                    exHtml = `
+                        <div class="space-y-1">
+                            <div><span class="text-[10px] font-bold text-indigo-500 uppercase">EN:</span> ${item.example.en}</div>
+                            <div><span class="text-[10px] font-bold text-emerald-600 uppercase">中文:</span> ${item.example.zh}</div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                        <div>
+                            <!-- Card Header: Term & Category -->
+                            <div class="flex items-start justify-between gap-2 mb-3">
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-400 font-mono">#${index + 1}</div>
+                                    <h3 class="text-lg font-extrabold tracking-tight group-hover:text-indigo-600 transition">
+                                        ${termHtml}
+                                    </h3>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 ${badgeStyle}">
+                                    ${item.category}
+                                </span>
+                            </div>
+
+                            <!-- Definition -->
+                            <div class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                                ${defHtml}
+                            </div>
+                        </div>
+
+                        <!-- Example Box -->
+                        <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-600">
+                            <div class="font-bold text-slate-700 flex items-center gap-1.5 mb-1 text-[11px]">
+                                <i class="fa-solid fa-code text-indigo-500"></i>
+                                <span>${currentLang === 'zh' ? '範例 (Example):' : 'Example:'}</span>
+                            </div>
+                            <div class="leading-relaxed">
+                                ${exHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFlashcards() {
+            const gridContainer = document.getElementById('flashcardGrid');
+            const cardCountEl = document.getElementById('cardGridCount');
+            cardCountEl.textContent = filteredVocabList.length;
+
+            if (filteredVocabList.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-400">
+                        No flashcards match your current filter.
+                    </div>
+                `;
+                return;
+            }
+
+            gridContainer.innerHTML = filteredVocabList.map((item, index) => {
+                const isFlipped = flippedCardMap[item.id] || false;
+                const badgeStyle = getCategoryBadge(item.category);
+
+                let frontTerm = (currentLang === 'zh') ? item.term.zh : item.term.en;
+                let secondaryTerm = (currentLang === 'both') ? `<div class="text-xs text-indigo-200 mt-1">${item.term.zh}</div>` : '';
+
+                let defContent = (currentLang === 'zh') ? item.definition.zh : item.definition.en;
+                let exContent = (currentLang === 'zh') ? item.example.zh : item.example.en;
+
+                if (currentLang === 'both') {
+                    defContent = `
+                        <div class="text-xs space-y-1 mb-2">
+                            <p>${item.definition.en}</p>
+                            <p class="text-slate-500 border-t border-slate-100 pt-1 text-[11px]">${item.definition.zh}</p>
+                        </div>
+                    `;
+                    exContent = `
+                        <div class="text-[11px] text-slate-600">
+                            <span>${item.example.en}</span>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="perspective-1000 h-80 cursor-pointer select-none" onclick="toggleCardFlip('${item.id}')">
+                        <div id="card-inner-${item.id}" class="preserve-3d relative w-full h-full rounded-2xl shadow-sm border border-slate-200 transition-transform duration-500 ${isFlipped ? 'rotate-y-180' : ''}">
+                            
+                            <!-- FRONT OF CARD (Vocabulary Term) -->
+                            <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 flex flex-col justify-between items-center text-center border-2 border-transparent hover:border-indigo-200 transition">
+                                <div class="w-full flex items-center justify-between text-xs text-slate-400">
+                                    <span class="font-mono font-bold">#${index + 1}</span>
+                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${badgeStyle}">
+                                        ${item.category}
+                                    </span>
+                                </div>
+
+                                <div class="my-auto px-2">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-3 shadow-inner">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                    </div>
+                                    <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
+                                        ${frontTerm}
+                                    </h3>
+                                    ${secondaryTerm}
+                                </div>
+
+                                <div class="text-[11px] text-indigo-500 font-semibold flex items-center gap-1.5 bg-indigo-50 px-3 py-1 rounded-full">
+                                    <i class="fa-solid fa-rotate text-xs"></i> Click or tap to reveal definition
+                                </div>
+                            </div>
+
+                            <!-- BACK OF CARD (Definition & Example) -->
+                            <div class="backface-hidden rotate-y-180 absolute inset-0 bg-white rounded-2xl p-5 flex flex-col justify-between border-2 border-indigo-400/40 shadow-inner overflow-hidden">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <h4 class="font-extrabold text-sm text-indigo-900 line-clamp-1">
+                                        ${item.term.en}
+                                    </h4>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Definition</span>
+                                </div>
+
+                                <!-- Definition Text -->
+                                <div class="overflow-y-auto my-2 pr-1 text-xs text-slate-700 leading-relaxed">
+                                    ${defContent}
+                                </div>
+
+                                <!-- Example Box -->
+                                <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 text-[11px] text-slate-600">
+                                    <span class="font-bold text-indigo-700 block mb-0.5">
+                                        <i class="fa-solid fa-code text-[10px]"></i> ${currentLang === 'zh' ? '範例 (Example):' : 'Example:'}
+                                    </span>
+                                    <div class="line-clamp-2">
+                                        ${exContent}
+                                    </div>
+                                </div>
+
+                                <div class="text-[10px] text-slate-400 text-center pt-1">
+                                    Click again to flip back
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // If in focus layout, also update focus card
+            if (cardLayout === 'focus') {
+                renderFocusCard();
+            }
+        }
+
+        function renderFocusCard() {
+            const slot = document.getElementById('focusCardSlot');
+            const counter = document.getElementById('focusCardCounter');
+            
+            if (filteredVocabList.length === 0) {
+                slot.innerHTML = `<div class="p-8 text-center text-slate-400">No terms to display.</div>`;
+                return;
+            }
+
+            if (activeFocusIndex >= filteredVocabList.length) {
+                activeFocusIndex = 0;
+            } else if (activeFocusIndex < 0) {
+                activeFocusIndex = filteredVocabList.length - 1;
+            }
+
+            const item = filteredVocabList[activeFocusIndex];
+            const isFlipped = flippedCardMap[item.id] || false;
+            const badgeStyle = getCategoryBadge(item.category);
+
+            counter.textContent = `Card ${activeFocusIndex + 1} of ${filteredVocabList.length}`;
+
+            let frontTerm = (currentLang === 'zh') ? item.term.zh : item.term.en;
+            let defContent = (currentLang === 'zh') ? item.definition.zh : item.definition.en;
+            let exContent = (currentLang === 'zh') ? item.example.zh : item.example.en;
+
+            slot.innerHTML = `
+                <div class="perspective-1000 h-96 cursor-pointer select-none" onclick="toggleCardFlip('${item.id}', true)">
+                    <div id="focus-inner-${item.id}" class="preserve-3d relative w-full h-full rounded-2xl shadow-lg border border-slate-200 transition-transform duration-500 ${isFlipped ? 'rotate-y-180' : ''}">
+                        
+                        <!-- FRONT -->
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-2xl p-8 flex flex-col justify-between items-center text-center border-2 border-indigo-200">
+                            <div class="w-full flex items-center justify-between text-xs text-slate-400">
+                                <span class="font-mono font-bold text-sm text-indigo-600">#${activeFocusIndex + 1}</span>
+                                <span class="text-xs font-bold uppercase px-3 py-1 rounded-full border ${badgeStyle}">
+                                    ${item.category}
+                                </span>
+                            </div>
+
+                            <div class="my-auto px-4">
+                                <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl mb-4 shadow-md">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <h3 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                                    ${frontTerm}
+                                </h3>
+                                ${currentLang === 'both' ? `<div class="text-sm font-medium text-slate-500 mt-1">${item.term.zh}</div>` : ''}
+                            </div>
+
+                            <div class="text-xs text-indigo-600 font-semibold bg-white/80 backdrop-blur px-4 py-1.5 rounded-full border border-indigo-200 shadow-sm flex items-center gap-1.5">
+                                <i class="fa-solid fa-arrows-rotate"></i> Tap card or spacebar to flip
+                            </div>
+                        </div>
+
+                        <!-- BACK -->
+                        <div class="backface-hidden rotate-y-180 absolute inset-0 bg-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-indigo-500 shadow-xl overflow-hidden">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <div>
+                                    <h4 class="font-black text-lg text-indigo-900">
+                                        ${item.term.en}
+                                    </h4>
+                                    <span class="text-xs text-slate-400">${item.term.zh}</span>
+                                </div>
+                                <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100 uppercase">
+                                    Definition & Example
+                                </span>
+                            </div>
+
+                            <!-- Definition -->
+                            <div class="overflow-y-auto my-3 text-xs sm:text-sm text-slate-700 leading-relaxed pr-2">
+                                ${defContent}
+                            </div>
+
+                            <!-- Example -->
+                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-xs text-slate-600">
+                                <span class="font-bold text-indigo-700 flex items-center gap-1 mb-1">
+                                    <i class="fa-solid fa-terminal"></i> ${currentLang === 'zh' ? '範例 (Example):' : 'Unit Example:'}
+                                </span>
+                                <div>${exContent}</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleCardFlip(id, isFromFocus = false) {
+            flippedCardMap[id] = !flippedCardMap[id];
+            
+            // Check DOM element
+            const innerCard = document.getElementById(`card-inner-${id}`);
+            if (innerCard) {
+                if (flippedCardMap[id]) {
+                    innerCard.classList.add('rotate-y-180');
+                } else {
+                    innerCard.classList.remove('rotate-y-180');
+                }
+            }
+
+            const focusInner = document.getElementById(`focus-inner-${id}`);
+            if (focusInner) {
+                if (flippedCardMap[id]) {
+                    focusInner.classList.add('rotate-y-180');
+                } else {
+                    focusInner.classList.remove('rotate-y-180');
+                }
+            }
+        }
+
+        function toggleSingleFocusFlip() {
+            if (filteredVocabList.length === 0) return;
+            const item = filteredVocabList[activeFocusIndex];
+            toggleCardFlip(item.id, true);
+        }
+
+        function toggleFlipAll() {
+            isAllFlipped = !isAllFlipped;
+            const label = document.getElementById('flipAllLabel');
+            label.textContent = isAllFlipped ? "Flip to Terms" : "Flip All";
+
+            filteredVocabList.forEach(item => {
+                flippedCardMap[item.id] = isAllFlipped;
+                const inner = document.getElementById(`card-inner-${item.id}`);
+                if (inner) {
+                    if (isAllFlipped) {
+                        inner.classList.add('rotate-y-180');
+                    } else {
+                        inner.classList.remove('rotate-y-180');
+                    }
+                }
+            });
+
+            if (cardLayout === 'focus') {
+                renderFocusCard();
+            }
+        }
+
+        function shuffleCards() {
+            // Fisher-Yates Shuffle Algorithm
+            for (let i = filteredVocabList.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredVocabList[i], filteredVocabList[j]] = [filteredVocabList[j], filteredVocabList[i]];
+            }
+            activeFocusIndex = 0;
+            renderFlashcards();
+            
+            // Brief visual shake animation on button
+            const btn = event.currentTarget;
+            btn.classList.add('bg-indigo-50');
+            setTimeout(() => btn.classList.remove('bg-indigo-50'), 300);
+        }
+
+        function navFocusCard(dir) {
+            activeFocusIndex += dir;
+            if (activeFocusIndex >= filteredVocabList.length) activeFocusIndex = 0;
+            if (activeFocusIndex < 0) activeFocusIndex = filteredVocabList.length - 1;
+            renderFocusCard();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            applyFilters();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            searchQuery = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            applyFilters();
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            
+            // Update pill styles
+            document.querySelectorAll('.cat-pill').forEach(pill => {
+                pill.className = "cat-pill text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 shrink-0";
+            });
+            event.currentTarget.className = "cat-pill active text-xs font-semibold px-2.5 py-1 rounded-lg border transition bg-indigo-600 text-white border-indigo-600 shrink-0";
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            filteredVocabList = VOCAB_DATABASE.filter(item => {
+                // Category match
+                const matchesCat = (currentCategory === 'all') || (item.category === currentCategory);
+                
+                // Search match (Term En, Term Zh, Definition En/Zh, Category)
+                const matchesQuery = !searchQuery || 
+                    item.term.en.toLowerCase().includes(searchQuery) ||
+                    item.term.zh.toLowerCase().includes(searchQuery) ||
+                    item.definition.en.toLowerCase().includes(searchQuery) ||
+                    item.definition.zh.toLowerCase().includes(searchQuery) ||
+                    item.example.en.toLowerCase().includes(searchQuery) ||
+                    item.example.zh.toLowerCase().includes(searchQuery);
+
+                return matchesCat && matchesQuery;
+            });
+
+            document.getElementById('termCounter').textContent = filteredVocabList.length;
+            activeFocusIndex = 0;
+
+            if (currentViewMode === 'list') {
+                renderGlossaryList();
+            } else {
+                renderFlashcards();
+            }
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // Button styles
+            const enBtn = document.getElementById('langEnBtn');
+            const zhBtn = document.getElementById('langZhBtn');
+            const bothBtn = document.getElementById('langBothBtn');
+            
+            const activeClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-indigo-900 shadow";
+            const inactiveClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white";
+
+            enBtn.className = (lang === 'en') ? activeClass : inactiveClass;
+            zhBtn.className = (lang === 'zh') ? activeClass : inactiveClass;
+            bothBtn.className = (lang === 'both') ? activeClass : inactiveClass;
+
+            // Update Statement of Inquiry header text
+            const soiEl = document.getElementById('soiText');
+            if (lang === 'zh') {
+                soiEl.textContent = '「真實世界現象可以被模擬為簡化的循環。」';
+            } else if (lang === 'both') {
+                soiEl.textContent = '"Real world phenomena can be simulated as simplified cycles." | 「真實世界現象可以被模擬為簡化的循環。」';
+            } else {
+                soiEl.textContent = '"Real world phenomena can be simulated as simplified cycles."';
+            }
+
+            if (currentViewMode === 'list') {
+                renderGlossaryList();
+            } else {
+                renderFlashcards();
+            }
+        }
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            const listBtn = document.getElementById('modeListBtn');
+            const flashBtn = document.getElementById('modeFlashBtn');
+            const glossaryView = document.getElementById('glossaryView');
+            const flashcardsView = document.getElementById('flashcardsView');
+            const flashcardToolbar = document.getElementById('flashcardToolbar');
+
+            const activeClass = "px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-indigo-500 text-white shadow";
+            const inactiveClass = "px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-indigo-200 hover:text-white";
+
+            if (mode === 'list') {
+                listBtn.className = activeClass;
+                flashBtn.className = inactiveClass;
+                glossaryView.classList.remove('hidden');
+                flashcardsView.classList.add('hidden');
+                flashcardToolbar.classList.add('hidden');
+                renderGlossaryList();
+            } else {
+                flashBtn.className = activeClass;
+                listBtn.className = inactiveClass;
+                glossaryView.classList.add('hidden');
+                flashcardsView.classList.remove('hidden');
+                flashcardToolbar.classList.remove('hidden');
+                renderFlashcards();
+            }
+        }
+
+        function setCardLayout(layout) {
+            cardLayout = layout;
+            const gridContainer = document.getElementById('flashcardGridContainer');
+            const focusContainer = document.getElementById('focusModeContainer');
+            const gridBtn = document.getElementById('layoutGridBtn');
+            const focusBtn = document.getElementById('layoutFocusBtn');
+
+            if (layout === 'grid') {
+                gridBtn.className = "p-1.5 text-xs rounded bg-white text-indigo-600 shadow-sm";
+                focusBtn.className = "p-1.5 text-xs rounded text-slate-500 hover:text-indigo-600";
+                gridContainer.classList.remove('hidden');
+                focusContainer.classList.add('hidden');
+            } else {
+                focusBtn.className = "p-1.5 text-xs rounded bg-white text-indigo-600 shadow-sm";
+                gridBtn.className = "p-1.5 text-xs rounded text-slate-500 hover:text-indigo-600";
+                gridContainer.classList.add('hidden');
+                focusContainer.classList.remove('hidden');
+                renderFocusCard();
+            }
+        }
+
+        // Keyboard shortcuts for Flashcard Study Focus Mode
+        document.addEventListener('keydown', (e) => {
+            if (currentViewMode === 'flashcards' && cardLayout === 'focus') {
+                if (e.code === 'ArrowRight') {
+                    navFocusCard(1);
+                } else if (e.code === 'ArrowLeft') {
+                    navFocusCard(-1);
+                } else if (e.code === 'Space') {
+                    e.preventDefault();
+                    toggleSingleFocusFlip();
+                }
+            }
+        });
+
+        window.onload = function() {
+            renderGlossaryList();
+        };
+    </script>
+</body>
+</html>
