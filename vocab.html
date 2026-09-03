@@ -102,6 +102,110 @@
             font-weight: 600;
             border: 1px solid rgba(124, 22, 45, 0.15);
         }
+
+        @media print {
+            @page {
+                margin: 1.2cm;
+                size: portrait;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-size: 11pt;
+            }
+            /* Hide web-only UI elements */
+            header,
+            section,
+            footer,
+            #emptySearchNotice,
+            #focusModeContainer,
+            .no-print,
+            button {
+                display: none !important;
+            }
+            main {
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+
+            /* Print Header */
+            .print-only-header {
+                display: block !important;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #7C162D;
+                padding-bottom: 10px;
+            }
+
+            /* Glossary Print Styling */
+            #glossaryGrid {
+                display: block !important;
+                gap: 0 !important;
+            }
+            .glossary-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: none !important;
+                margin-bottom: 16px !important;
+                padding: 14px 16px !important;
+                background: #ffffff !important;
+            }
+            .glossary-card-body {
+                display: block !important; /* Force expand during print */
+            }
+            .collapse-btn-icon {
+                display: none !important;
+            }
+
+            /* Flashcard Cutout Print Styling */
+            #flashcardGrid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 16px !important;
+            }
+            .flashcard-print-container {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 2px dashed #94a3b8 !important;
+                border-radius: 12px !important;
+                padding: 12px !important;
+                background: #ffffff !important;
+                min-height: 220px;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                position: relative;
+            }
+            .flashcard-print-front,
+            .flashcard-print-back {
+                display: block !important;
+            }
+            .perspective-1000 {
+                perspective: none !important;
+                height: auto !important;
+            }
+            .preserve-3d {
+                transform: none !important;
+                transition: none !important;
+            }
+            .backface-hidden {
+                position: static !important;
+                backface-visibility: visible !important;
+                transform: none !important;
+            }
+            .web-card-inner {
+                display: none !important;
+            }
+            .print-cutout-label {
+                display: block !important;
+            }
+        }
+
+        .print-only-header,
+        .print-cutout-label,
+        .flashcard-print-container {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-[#7C162D] selection:text-white">
@@ -210,10 +314,25 @@
                 </div>
             </div>
 
+            <!-- Right: Glossary Controls (Visible only in Glossary Mode) -->
+            <div id="glossaryToolbar" class="flex items-center gap-2 justify-end">
+                <!-- Collapse / Expand All Button -->
+                <button id="collapseAllBtn" onclick="toggleGlossaryCollapseAll()" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <i id="collapseAllIcon" class="fa-solid fa-compress text-[#1E4B7C]"></i>
+                    <span id="collapseAllText">Collapse All</span>
+                </button>
+
+                <!-- Print Glossary Button -->
+                <button onclick="triggerPrint('glossary')" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-[#1E4B7C]/30 bg-[#f0f6fc] hover:bg-[#e1ecf8] text-[#1E4B7C] transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Print Sheet</span>
+                </button>
+            </div>
+
             <!-- Right: Flashcard Action Buttons (Visible only in Flashcard Mode) -->
             <div id="flashcardToolbar" class="hidden flex items-center gap-2 justify-end">
                 <!-- Shuffle Button -->
-                <button onclick="shuffleCards()" class="px-3.5 py-1.5 text-xs font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                <button onclick="shuffleCards()" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 shadow-sm active:scale-95">
                     <i class="fa-solid fa-shuffle text-[#1E4B7C]"></i>
                     <span>Shuffle</span>
                 </button>
@@ -222,6 +341,12 @@
                 <button id="flipAllBtn" onclick="toggleFlipAll()" class="px-3.5 py-1.5 text-xs font-bold rounded-lg border border-[#7C162D]/30 bg-[#fdf2f4] hover:bg-[#fbe4e8] text-[#7C162D] transition flex items-center gap-1.5 shadow-sm active:scale-95">
                     <i class="fa-solid fa-arrows-rotate text-[#7C162D]"></i>
                     <span id="flipAllLabel">Flip to Definitions</span>
+                </button>
+
+                <!-- Print Flashcards Button -->
+                <button onclick="triggerPrint('flashcards')" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-[#1E4B7C]/30 bg-[#f0f6fc] hover:bg-[#e1ecf8] text-[#1E4B7C] transition flex items-center gap-1.5 shadow-sm active:scale-95" title="Printable Cut-out Flashcards">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Print Cards</span>
                 </button>
 
                 <!-- Study Focus View Mode Toggle -->
@@ -240,6 +365,20 @@
 
     <!-- Main Content Stage -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- Print-Only Title Header -->
+        <div class="print-only-header">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-extrabold text-[#7C162D]">MYP Year 8 Design: Cycles of Life (生命的循環)</h1>
+                    <p class="text-xs text-slate-600 font-medium">Concept Glossary & Revision Reference • SOI: "Real world phenomena can be simulated as simplified cycles."</p>
+                </div>
+                <div class="text-right text-xs text-slate-500">
+                    <span id="printModeLabel" class="font-bold text-[#1E4B7C] uppercase">Glossary Study Guide</span><br>
+                    <span>26 Essential Terms</span>
+                </div>
+            </div>
+        </div>
         
         <!-- View A: Standard Glossary List View (1 Card Per Row, Generous Spacing) -->
         <div id="glossaryView" class="w-full">
@@ -753,9 +892,15 @@
         let cardLayout = 'grid';       // 'grid', 'focus'
         let activeFocusIndex = 0;
         let isAllFlipped = false;
+        let isGlossaryAllCollapsed = false;
         
         // Track individual card flip states in an object
         let flippedCardMap = {};
+        // Track individual card collapsed states in glossary
+        let collapsedGlossaryCardMap = {};
+
+        // Independent Flashcard order state (preserved across tab switches)
+        let flashcardOrderList = [...VOCAB_DATABASE];
 
         // Filtered array cache
         let filteredVocabList = [...VOCAB_DATABASE];
@@ -786,8 +931,14 @@
             
             emptyNotice.classList.add('hidden');
             
-            container.innerHTML = filteredVocabList.map((item, index) => {
+            // STRICT RULE: Glossary View is ALWAYS sorted alphabetically (A-Z by English term)
+            const alphabeticalList = [...filteredVocabList].sort((a, b) => 
+                a.term.en.localeCompare(b.term.en)
+            );
+            
+            container.innerHTML = alphabeticalList.map((item, index) => {
                 const badgeStyle = getCategoryBadge(item.category);
+                const isCollapsed = collapsedGlossaryCardMap[item.id] || false;
                 
                 let termHtml = '';
                 let defHtml = '';
@@ -819,37 +970,45 @@
                 }
 
                 return `
-                    <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div id="glossary-card-${item.id}" class="glossary-card bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
                         <div>
-                            <!-- Header: Term, Index, & Category Badge -->
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4 pb-3 border-b border-slate-100">
-                                <div class="flex items-baseline gap-3">
+                            <!-- Header: Term, Index, Badge, & Interactive Collapse Toggle -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100 cursor-pointer select-none" onclick="toggleCardCollapse('${item.id}')">
+                                <div class="flex items-center gap-3">
                                     <span class="text-xs font-mono font-bold text-[#7C162D] bg-[#fdf2f4] px-2.5 py-0.5 rounded-md border border-[#7C162D]/20 shrink-0">
                                         #${index + 1}
                                     </span>
-                                    <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight group-hover:text-[#1E4B7C] transition">
+                                    <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight group-hover:text-[#1E4B7C] transition flex items-center gap-2">
                                         ${termHtml}
                                     </h3>
                                 </div>
-                                <span class="text-[11px] font-bold uppercase px-3 py-1 rounded-full border self-start sm:self-auto shrink-0 shadow-xs ${badgeStyle}">
-                                    ${item.category}
-                                </span>
+                                <div class="flex items-center gap-2 self-end sm:self-auto">
+                                    <span class="text-[11px] font-bold uppercase px-3 py-1 rounded-full border shrink-0 shadow-xs ${badgeStyle}">
+                                        ${item.category}
+                                    </span>
+                                    <button class="collapse-btn-icon text-slate-400 hover:text-[#1E4B7C] transition p-1 rounded">
+                                        <i id="chevron-${item.id}" class="fa-solid fa-chevron-${isCollapsed ? 'down' : 'up'} text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
 
-                            <!-- Definition (Enlarged font and line height) -->
-                            <div class="text-sm sm:text-base text-slate-700 leading-relaxed mb-5">
-                                ${defHtml}
-                            </div>
-                        </div>
+                            <!-- Collapsible Card Content Body -->
+                            <div id="body-${item.id}" class="glossary-card-body ${isCollapsed ? 'hidden' : ''} pt-4">
+                                <!-- Definition -->
+                                <div class="text-sm sm:text-base text-slate-700 leading-relaxed mb-5">
+                                    ${defHtml}
+                                </div>
 
-                        <!-- Example Box (Spacious, Clear) -->
-                        <div class="bg-slate-50 border-l-4 border-[#1E4B7C] rounded-r-xl p-4 text-xs sm:text-sm text-slate-600">
-                            <div class="font-bold text-[#1E4B7C] flex items-center gap-2 mb-1 text-xs uppercase tracking-wider">
-                                <i class="fa-solid fa-code"></i>
-                                <span>${currentLang === 'zh' ? '單元範例 (Example):' : 'Unit Example:'}</span>
-                            </div>
-                            <div class="leading-relaxed">
-                                ${exHtml}
+                                <!-- Example Box (Spacious, Clear) -->
+                                <div class="bg-slate-50 border-l-4 border-[#1E4B7C] rounded-r-xl p-4 text-xs sm:text-sm text-slate-600">
+                                    <div class="font-bold text-[#1E4B7C] flex items-center gap-2 mb-1 text-xs uppercase tracking-wider">
+                                        <i class="fa-solid fa-code"></i>
+                                        <span>${currentLang === 'zh' ? '單元範例 (Example):' : 'Unit Example:'}</span>
+                                    </div>
+                                    <div class="leading-relaxed">
+                                        ${exHtml}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -857,12 +1016,57 @@
             }).join('');
         }
 
+        function toggleCardCollapse(id) {
+            collapsedGlossaryCardMap[id] = !collapsedGlossaryCardMap[id];
+            const body = document.getElementById(`body-${id}`);
+            const chevron = document.getElementById(`chevron-${id}`);
+            if (body && chevron) {
+                if (collapsedGlossaryCardMap[id]) {
+                    body.classList.add('hidden');
+                    chevron.className = 'fa-solid fa-chevron-down text-xs';
+                } else {
+                    body.classList.remove('hidden');
+                    chevron.className = 'fa-solid fa-chevron-up text-xs';
+                }
+            }
+        }
+
+        function toggleGlossaryCollapseAll() {
+            isGlossaryAllCollapsed = !isGlossaryAllCollapsed;
+            const btnText = document.getElementById('collapseAllText');
+            const btnIcon = document.getElementById('collapseAllIcon');
+
+            btnText.textContent = isGlossaryAllCollapsed ? "Expand All" : "Collapse All";
+            btnIcon.className = isGlossaryAllCollapsed ? "fa-solid fa-expand text-[#1E4B7C]" : "fa-solid fa-compress text-[#1E4B7C]";
+
+            filteredVocabList.forEach(item => {
+                collapsedGlossaryCardMap[item.id] = isGlossaryAllCollapsed;
+                const body = document.getElementById(`body-${item.id}`);
+                const chevron = document.getElementById(`chevron-${item.id}`);
+                if (body && chevron) {
+                    if (isGlossaryAllCollapsed) {
+                        body.classList.add('hidden');
+                        chevron.className = 'fa-solid fa-chevron-down text-xs';
+                    } else {
+                        body.classList.remove('hidden');
+                        chevron.className = 'fa-solid fa-chevron-up text-xs';
+                    }
+                }
+            });
+        }
+
         function renderFlashcards() {
             const gridContainer = document.getElementById('flashcardGrid');
             const cardCountEl = document.getElementById('cardGridCount');
-            cardCountEl.textContent = filteredVocabList.length;
+            
+            // Filter the saved flashcard order so it respects current category and search filters
+            const activeCards = flashcardOrderList.filter(item => 
+                filteredVocabList.some(f => f.id === item.id)
+            );
 
-            if (filteredVocabList.length === 0) {
+            cardCountEl.textContent = activeCards.length;
+
+            if (activeCards.length === 0) {
                 gridContainer.innerHTML = `
                     <div class="col-span-full py-12 text-center text-slate-400">
                         No flashcards match your current filter.
@@ -871,7 +1075,7 @@
                 return;
             }
 
-            gridContainer.innerHTML = filteredVocabList.map((item, index) => {
+            gridContainer.innerHTML = activeCards.map((item, index) => {
                 const isFlipped = flippedCardMap[item.id] || false;
                 const badgeStyle = getCategoryBadge(item.category);
 
@@ -896,7 +1100,8 @@
                 }
 
                 return `
-                    <div class="perspective-1000 h-80 cursor-pointer select-none" onclick="toggleCardFlip('${item.id}')">
+                    <!-- Web Interactive 3D Card -->
+                    <div class="web-card-inner perspective-1000 h-80 cursor-pointer select-none" onclick="toggleCardFlip('${item.id}')">
                         <div id="card-inner-${item.id}" class="preserve-3d relative w-full h-full rounded-2xl shadow-sm border border-slate-200 transition-transform duration-500 ${isFlipped ? 'rotate-y-180' : ''}">
                             
                             <!-- FRONT OF CARD (Vocabulary Term) -->
@@ -956,6 +1161,23 @@
 
                         </div>
                     </div>
+
+                    <!-- Print-Only Cutout Layout (Term + Definition printed together with cut guide) -->
+                    <div class="flashcard-print-container">
+                        <div>
+                            <div class="flex justify-between items-center text-[10px] text-slate-500 pb-1 border-b border-dashed border-slate-300 mb-2">
+                                <span class="font-mono font-bold text-[#7C162D]">CARD #${index + 1}</span>
+                                <span class="font-bold uppercase">${item.category}</span>
+                            </div>
+                            <h4 class="text-lg font-bold text-slate-900 mb-2">${item.term.en} <span class="text-xs text-[#7C162D]">(${item.term.zh})</span></h4>
+                            <div class="text-xs text-slate-700 leading-relaxed mb-3">
+                                ${item.definition.en}
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-2 rounded border border-slate-200 text-[10px] text-slate-600">
+                            <strong>Example:</strong> ${item.example.en}
+                        </div>
+                    </div>
                 `;
             }).join('');
 
@@ -964,153 +1186,11 @@
             }
         }
 
-        function renderFocusCard() {
-            const slot = document.getElementById('focusCardSlot');
-            const counter = document.getElementById('focusCardCounter');
-            
-            if (filteredVocabList.length === 0) {
-                slot.innerHTML = `<div class="p-8 text-center text-slate-400">No terms to display.</div>`;
-                return;
-            }
-
-            if (activeFocusIndex >= filteredVocabList.length) {
-                activeFocusIndex = 0;
-            } else if (activeFocusIndex < 0) {
-                activeFocusIndex = filteredVocabList.length - 1;
-            }
-
-            const item = filteredVocabList[activeFocusIndex];
-            const isFlipped = flippedCardMap[item.id] || false;
-            const badgeStyle = getCategoryBadge(item.category);
-
-            counter.textContent = `Card ${activeFocusIndex + 1} of ${filteredVocabList.length}`;
-
-            let frontTerm = (currentLang === 'zh') ? item.term.zh : item.term.en;
-            let defContent = (currentLang === 'zh') ? item.definition.zh : item.definition.en;
-            let exContent = (currentLang === 'zh') ? item.example.zh : item.example.en;
-
-            slot.innerHTML = `
-                <div class="perspective-1000 h-96 cursor-pointer select-none" onclick="toggleCardFlip('${item.id}', true)">
-                    <div id="focus-inner-${item.id}" class="preserve-3d relative w-full h-full rounded-2xl shadow-lg border border-slate-200 transition-transform duration-500 ${isFlipped ? 'rotate-y-180' : ''}">
-                        
-                        <!-- FRONT -->
-                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-[#fdf2f4] via-white to-[#f0f6fc] rounded-2xl p-8 flex flex-col justify-between items-center text-center border-2 border-[#1E4B7C]/30">
-                            <div class="w-full flex items-center justify-between text-xs text-slate-400">
-                                <span class="font-mono font-bold text-sm text-[#7C162D]">#${activeFocusIndex + 1}</span>
-                                <span class="text-xs font-bold uppercase px-3 py-1 rounded-full border ${badgeStyle}">
-                                    ${item.category}
-                                </span>
-                            </div>
-
-                            <div class="my-auto px-4">
-                                <div class="w-16 h-16 mx-auto rounded-2xl bg-[#7C162D] text-white flex items-center justify-center text-2xl mb-4 shadow-md">
-                                    <i class="fa-solid fa-graduation-cap"></i>
-                                </div>
-                                <h3 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                                    ${frontTerm}
-                                </h3>
-                                ${currentLang === 'both' ? `<div class="text-sm font-bold text-[#1E4B7C] mt-1">${item.term.zh}</div>` : ''}
-                            </div>
-
-                            <div class="text-xs text-[#1E4B7C] font-semibold bg-white/80 backdrop-blur px-4 py-1.5 rounded-full border border-[#1E4B7C]/20 shadow-sm flex items-center gap-1.5">
-                                <i class="fa-solid fa-arrows-rotate"></i> Tap card or spacebar to flip
-                            </div>
-                        </div>
-
-                        <!-- BACK (NO VOCAB TERM - Test recall) -->
-                        <div class="backface-hidden rotate-y-180 absolute inset-0 bg-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-[#7C162D] shadow-xl overflow-hidden">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-8 h-8 rounded-full bg-[#fdf2f4] text-[#7C162D] flex items-center justify-center font-bold">
-                                        <i class="fa-solid fa-question"></i>
-                                    </span>
-                                    <div>
-                                        <h4 class="font-bold text-sm text-slate-800">What is this concept?</h4>
-                                        <span class="text-[11px] text-slate-400">Read the definition and guess the term</span>
-                                    </div>
-                                </div>
-                                <span class="text-[10px] font-bold text-[#1E4B7C] bg-[#f0f6fc] px-2.5 py-1 rounded-full border border-[#1E4B7C]/20 uppercase">
-                                    ${item.category}
-                                </span>
-                            </div>
-
-                            <!-- Definition -->
-                            <div class="overflow-y-auto my-3 text-xs sm:text-sm text-slate-700 leading-relaxed pr-2">
-                                ${defContent}
-                            </div>
-
-                            <!-- Example -->
-                            <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs text-slate-600">
-                                <span class="font-bold text-[#1E4B7C] flex items-center gap-1.5 mb-1 text-xs">
-                                    <i class="fa-solid fa-terminal"></i> ${currentLang === 'zh' ? '範例提示 (Example Clue):' : 'Unit Clue / Example:'}
-                                </span>
-                                <div>${exContent}</div>
-                            </div>
-
-                            <div class="text-[11px] text-slate-400 text-center pt-1 font-medium">
-                                Press Spacebar or click card to verify your answer
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            `;
-        }
-
-        function toggleCardFlip(id, isFromFocus = false) {
-            flippedCardMap[id] = !flippedCardMap[id];
-            
-            const innerCard = document.getElementById(`card-inner-${id}`);
-            if (innerCard) {
-                if (flippedCardMap[id]) {
-                    innerCard.classList.add('rotate-y-180');
-                } else {
-                    innerCard.classList.remove('rotate-y-180');
-                }
-            }
-
-            const focusInner = document.getElementById(`focus-inner-${id}`);
-            if (focusInner) {
-                if (flippedCardMap[id]) {
-                    focusInner.classList.add('rotate-y-180');
-                } else {
-                    focusInner.classList.remove('rotate-y-180');
-                }
-            }
-        }
-
-        function toggleSingleFocusFlip() {
-            if (filteredVocabList.length === 0) return;
-            const item = filteredVocabList[activeFocusIndex];
-            toggleCardFlip(item.id, true);
-        }
-
-        function toggleFlipAll() {
-            isAllFlipped = !isAllFlipped;
-            const label = document.getElementById('flipAllLabel');
-            label.textContent = isAllFlipped ? "Flip to Terms" : "Flip to Definitions";
-
-            filteredVocabList.forEach(item => {
-                flippedCardMap[item.id] = isAllFlipped;
-                const inner = document.getElementById(`card-inner-${item.id}`);
-                if (inner) {
-                    if (isAllFlipped) {
-                        inner.classList.add('rotate-y-180');
-                    } else {
-                        inner.classList.remove('rotate-y-180');
-                    }
-                }
-            });
-
-            if (cardLayout === 'focus') {
-                renderFocusCard();
-            }
-        }
-
         function shuffleCards() {
-            for (let i = filteredVocabList.length - 1; i > 0; i--) {
+            // Shuffle ONLY the flashcard list so glossary order is never affected
+            for (let i = flashcardOrderList.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [filteredVocabList[i], filteredVocabList[j]] = [filteredVocabList[j], filteredVocabList[i]];
+                [flashcardOrderList[i], flashcardOrderList[j]] = [flashcardOrderList[j], flashcardOrderList[i]];
             }
             activeFocusIndex = 0;
             renderFlashcards();
@@ -1120,96 +1200,16 @@
             setTimeout(() => btn.classList.remove('bg-[#f0f6fc]'), 300);
         }
 
-        function navFocusCard(dir) {
-            activeFocusIndex += dir;
-            if (activeFocusIndex >= filteredVocabList.length) activeFocusIndex = 0;
-            if (activeFocusIndex < 0) activeFocusIndex = filteredVocabList.length - 1;
-            renderFocusCard();
-        }
-
-        function handleSearch(val) {
-            searchQuery = val.toLowerCase().trim();
-            const clearBtn = document.getElementById('clearSearchBtn');
-            if (searchQuery.length > 0) {
-                clearBtn.classList.remove('hidden');
+        function triggerPrint(mode) {
+            const printLabel = document.getElementById('printModeLabel');
+            if (mode === 'flashcards') {
+                printLabel.textContent = "Printable Revision Cut-out Flashcards";
+                setViewMode('flashcards');
             } else {
-                clearBtn.classList.add('hidden');
+                printLabel.textContent = "Glossary Reference & Study Sheet";
+                setViewMode('list');
             }
-            applyFilters();
-        }
-
-        function clearSearch() {
-            const input = document.getElementById('searchInput');
-            input.value = '';
-            searchQuery = '';
-            document.getElementById('clearSearchBtn').classList.add('hidden');
-            applyFilters();
-        }
-
-        function filterCategory(cat) {
-            currentCategory = cat;
-            
-            document.querySelectorAll('.cat-pill').forEach(pill => {
-                pill.className = "cat-pill text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 shrink-0";
-            });
-            event.currentTarget.className = "cat-pill active text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-[#1E4B7C] text-white border-[#1E4B7C] shrink-0 shadow-sm";
-
-            applyFilters();
-        }
-
-        function applyFilters() {
-            filteredVocabList = VOCAB_DATABASE.filter(item => {
-                const matchesCat = (currentCategory === 'all') || (item.category === currentCategory);
-                
-                const matchesQuery = !searchQuery || 
-                    item.term.en.toLowerCase().includes(searchQuery) ||
-                    item.term.zh.toLowerCase().includes(searchQuery) ||
-                    item.definition.en.toLowerCase().includes(searchQuery) ||
-                    item.definition.zh.toLowerCase().includes(searchQuery) ||
-                    item.example.en.toLowerCase().includes(searchQuery) ||
-                    item.example.zh.toLowerCase().includes(searchQuery);
-
-                return matchesCat && matchesQuery;
-            });
-
-            document.getElementById('termCounter').textContent = filteredVocabList.length;
-            activeFocusIndex = 0;
-
-            if (currentViewMode === 'list') {
-                renderGlossaryList();
-            } else {
-                renderFlashcards();
-            }
-        }
-
-        function setLanguage(lang) {
-            currentLang = lang;
-            
-            const enBtn = document.getElementById('langEnBtn');
-            const zhBtn = document.getElementById('langZhBtn');
-            const bothBtn = document.getElementById('langBothBtn');
-            
-            const activeClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-[#7C162D] shadow";
-            const inactiveClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-white/80 hover:text-white";
-
-            enBtn.className = (lang === 'en') ? activeClass : inactiveClass;
-            zhBtn.className = (lang === 'zh') ? activeClass : inactiveClass;
-            bothBtn.className = (lang === 'both') ? activeClass : inactiveClass;
-
-            const soiEl = document.getElementById('soiText');
-            if (lang === 'zh') {
-                soiEl.textContent = '「真實世界現象可以被模擬為簡化的循環。」';
-            } else if (lang === 'both') {
-                soiEl.textContent = '"Real world phenomena can be simulated as simplified cycles." | 「真實世界現象可以被模擬為簡化的循環。」';
-            } else {
-                soiEl.textContent = '"Real world phenomena can be simulated as simplified cycles."';
-            }
-
-            if (currentViewMode === 'list') {
-                renderGlossaryList();
-            } else {
-                renderFlashcards();
-            }
+            window.print();
         }
 
         function setViewMode(mode) {
@@ -1218,6 +1218,7 @@
             const flashBtn = document.getElementById('modeFlashBtn');
             const glossaryView = document.getElementById('glossaryView');
             const flashcardsView = document.getElementById('flashcardsView');
+            const glossaryToolbar = document.getElementById('glossaryToolbar');
             const flashcardToolbar = document.getElementById('flashcardToolbar');
 
             const activeClass = "px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-[#1E4B7C] shadow";
@@ -1228,6 +1229,7 @@
                 flashBtn.className = inactiveClass;
                 glossaryView.classList.remove('hidden');
                 flashcardsView.classList.add('hidden');
+                glossaryToolbar.classList.remove('hidden');
                 flashcardToolbar.classList.add('hidden');
                 renderGlossaryList();
             } else {
@@ -1235,6 +1237,7 @@
                 listBtn.className = inactiveClass;
                 glossaryView.classList.add('hidden');
                 flashcardsView.classList.remove('hidden');
+                glossaryToolbar.classList.add('hidden');
                 flashcardToolbar.classList.remove('hidden');
                 renderFlashcards();
             }
