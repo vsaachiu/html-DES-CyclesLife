@@ -52,17 +52,21 @@
         /* 3D Flip Card Effect */
         .perspective-1000 {
             perspective: 1000px;
+            -webkit-perspective: 1000px;
         }
         .preserve-3d {
             transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .backface-hidden {
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
+            transform: rotateX(0deg);
         }
         .rotate-y-180 {
             transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
         }
         
         /* Custom scrollbar */
@@ -1186,6 +1190,290 @@
             }
         }
 
+        function renderFocusCard() {
+            const slot = document.getElementById('focusCardSlot');
+            const counter = document.getElementById('focusCardCounter');
+            if (!slot) return;
+            
+            const activeCards = flashcardOrderList.filter(item => 
+                filteredVocabList.some(f => f.id === item.id)
+            );
+
+            if (activeCards.length === 0) {
+                slot.innerHTML = `<div class="p-8 text-center text-slate-400">No terms match your current filter.</div>`;
+                if (counter) counter.textContent = 'Card 0 of 0';
+                return;
+            }
+
+            if (activeFocusIndex >= activeCards.length) {
+                activeFocusIndex = 0;
+            } else if (activeFocusIndex < 0) {
+                activeFocusIndex = activeCards.length - 1;
+            }
+
+            const item = activeCards[activeFocusIndex];
+            const isFlipped = flippedCardMap[item.id] || false;
+            const badgeStyle = getCategoryBadge(item.category);
+
+            if (counter) {
+                counter.textContent = `Card ${activeFocusIndex + 1} of ${activeCards.length}`;
+            }
+
+            let frontTerm = (currentLang === 'zh') ? item.term.zh : item.term.en;
+            let secondaryTerm = (currentLang === 'both') ? `<div class="text-sm font-bold text-[#7C162D] mt-1">${item.term.zh}</div>` : '';
+            let defContent = (currentLang === 'zh') ? item.definition.zh : item.definition.en;
+            let exContent = (currentLang === 'zh') ? item.example.zh : item.example.en;
+
+            if (currentLang === 'both') {
+                defContent = `
+                    <div class="text-xs space-y-2 mb-2">
+                        <p>${item.definition.en}</p>
+                        <p class="text-slate-500 border-t border-slate-100 pt-1.5 text-[11px]">${item.definition.zh}</p>
+                    </div>
+                `;
+                exContent = `
+                    <div class="text-[11px] text-slate-600 space-y-1">
+                        <div><span class="text-[10px] font-bold text-[#1E4B7C] uppercase mr-1">EN:</span> ${item.example.en}</div>
+                        <div class="pt-1 border-t border-slate-200/60"><span class="text-[10px] font-bold text-[#7C162D] uppercase mr-1">中文:</span> ${item.example.zh}</div>
+                    </div>
+                `;
+            }
+
+            slot.innerHTML = `
+                <div class="perspective-1000 h-96 cursor-pointer select-none" onclick="toggleCardFlip('${item.id}', true)">
+                    <div id="focus-inner-${item.id}" class="preserve-3d relative w-full h-full rounded-2xl shadow-lg border border-slate-200 transition-transform duration-500 ${isFlipped ? 'rotate-y-180' : ''}">
+                        
+                        <!-- FRONT -->
+                        <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-[#fdf2f4] via-white to-[#f0f6fc] rounded-2xl p-8 flex flex-col justify-between items-center text-center border-2 border-[#1E4B7C]/30">
+                            <div class="w-full flex items-center justify-between text-xs text-slate-400">
+                                <span class="font-mono font-bold text-sm text-[#7C162D]">#${activeFocusIndex + 1}</span>
+                                <span class="text-xs font-bold uppercase px-3 py-1 rounded-full border ${badgeStyle}">
+                                    ${item.category}
+                                </span>
+                            </div>
+
+                            <div class="my-auto px-4">
+                                <div class="w-16 h-16 mx-auto rounded-2xl bg-[#7C162D] text-white flex items-center justify-center text-2xl mb-4 shadow-md">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <h3 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                                    ${frontTerm}
+                                </h3>
+                                ${secondaryTerm}
+                            </div>
+
+                            <div class="text-xs text-[#1E4B7C] font-semibold bg-white/80 backdrop-blur px-4 py-1.5 rounded-full border border-[#1E4B7C]/20 shadow-sm flex items-center gap-1.5">
+                                <i class="fa-solid fa-arrows-rotate"></i> Tap card or spacebar to flip
+                            </div>
+                        </div>
+
+                        <!-- BACK (NO VOCAB TERM - Test recall) -->
+                        <div class="backface-hidden rotate-y-180 absolute inset-0 bg-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-[#7C162D] shadow-xl overflow-hidden">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-8 h-8 rounded-full bg-[#fdf2f4] text-[#7C162D] flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-question"></i>
+                                    </span>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-slate-800">What is this concept?</h4>
+                                        <span class="text-[11px] text-slate-400">Read the definition and guess the term</span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-[#1E4B7C] bg-[#f0f6fc] px-2.5 py-1 rounded-full border border-[#1E4B7C]/20 uppercase">
+                                    ${item.category}
+                                </span>
+                            </div>
+
+                            <!-- Definition -->
+                            <div class="overflow-y-auto my-3 text-xs sm:text-sm text-slate-700 leading-relaxed pr-2">
+                                ${defContent}
+                            </div>
+
+                            <!-- Example -->
+                            <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs text-slate-600">
+                                <span class="font-bold text-[#1E4B7C] flex items-center gap-1.5 mb-1 text-xs">
+                                    <i class="fa-solid fa-terminal"></i> ${currentLang === 'zh' ? '範例提示 (Example Clue):' : 'Unit Clue / Example:'}
+                                </span>
+                                <div>${exContent}</div>
+                            </div>
+
+                            <div class="text-[11px] text-slate-400 text-center pt-1 font-medium">
+                                Press Spacebar or click card to verify your answer
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleCardFlip(id, isFromFocus = false) {
+            flippedCardMap[id] = !flippedCardMap[id];
+            
+            const innerCard = document.getElementById(`card-inner-${id}`);
+            if (innerCard) {
+                if (flippedCardMap[id]) {
+                    innerCard.classList.add('rotate-y-180');
+                } else {
+                    innerCard.classList.remove('rotate-y-180');
+                }
+            }
+
+            const focusInner = document.getElementById(`focus-inner-${id}`);
+            if (focusInner) {
+                if (flippedCardMap[id]) {
+                    focusInner.classList.add('rotate-y-180');
+                } else {
+                    focusInner.classList.remove('rotate-y-180');
+                }
+            }
+        }
+
+        function toggleSingleFocusFlip() {
+            const activeCards = flashcardOrderList.filter(item => 
+                filteredVocabList.some(f => f.id === item.id)
+            );
+            if (activeCards.length === 0) return;
+            const item = activeCards[activeFocusIndex];
+            if (item) {
+                toggleCardFlip(item.id, true);
+            }
+        }
+
+        function toggleFlipAll() {
+            isAllFlipped = !isAllFlipped;
+            const label = document.getElementById('flipAllLabel');
+            if (label) {
+                label.textContent = isAllFlipped ? "Flip to Terms" : "Flip to Definitions";
+            }
+
+            const activeCards = flashcardOrderList.filter(item => 
+                filteredVocabList.some(f => f.id === item.id)
+            );
+
+            activeCards.forEach(item => {
+                flippedCardMap[item.id] = isAllFlipped;
+                const inner = document.getElementById(`card-inner-${item.id}`);
+                if (inner) {
+                    if (isAllFlipped) {
+                        inner.classList.add('rotate-y-180');
+                    } else {
+                        inner.classList.remove('rotate-y-180');
+                    }
+                }
+            });
+
+            if (cardLayout === 'focus') {
+                renderFocusCard();
+            }
+        }
+
+        function navFocusCard(dir) {
+            const activeCards = flashcardOrderList.filter(item => 
+                filteredVocabList.some(f => f.id === item.id)
+            );
+            if (activeCards.length === 0) return;
+            activeFocusIndex += dir;
+            if (activeFocusIndex >= activeCards.length) activeFocusIndex = 0;
+            if (activeFocusIndex < 0) activeFocusIndex = activeCards.length - 1;
+            renderFocusCard();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) {
+                if (searchQuery.length > 0) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                }
+            }
+            applyFilters();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            if (input) input.value = '';
+            searchQuery = '';
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            applyFilters();
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            
+            document.querySelectorAll('.cat-pill').forEach(pill => {
+                pill.className = "cat-pill text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 shrink-0";
+            });
+            if (typeof event !== 'undefined' && event && event.currentTarget) {
+                event.currentTarget.className = "cat-pill active text-xs font-semibold px-3 py-1.5 rounded-lg border transition bg-[#1E4B7C] text-white border-[#1E4B7C] shrink-0 shadow-sm";
+            }
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            filteredVocabList = VOCAB_DATABASE.filter(item => {
+                const matchesCat = (currentCategory === 'all') || (item.category === currentCategory);
+                
+                const matchesQuery = !searchQuery || 
+                    item.term.en.toLowerCase().includes(searchQuery) ||
+                    item.term.zh.toLowerCase().includes(searchQuery) ||
+                    item.definition.en.toLowerCase().includes(searchQuery) ||
+                    item.definition.zh.toLowerCase().includes(searchQuery) ||
+                    item.example.en.toLowerCase().includes(searchQuery) ||
+                    item.example.zh.toLowerCase().includes(searchQuery);
+
+                return matchesCat && matchesQuery;
+            });
+
+            const termCounter = document.getElementById('termCounter');
+            if (termCounter) {
+                termCounter.textContent = filteredVocabList.length;
+            }
+            activeFocusIndex = 0;
+
+            if (currentViewMode === 'list') {
+                renderGlossaryList();
+            } else {
+                renderFlashcards();
+            }
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            const enBtn = document.getElementById('langEnBtn');
+            const zhBtn = document.getElementById('langZhBtn');
+            const bothBtn = document.getElementById('langBothBtn');
+            
+            const activeClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 bg-white text-[#7C162D] shadow";
+            const inactiveClass = "px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 text-white/80 hover:text-white";
+
+            if (enBtn) enBtn.className = (lang === 'en') ? activeClass : inactiveClass;
+            if (zhBtn) zhBtn.className = (lang === 'zh') ? activeClass : inactiveClass;
+            if (bothBtn) bothBtn.className = (lang === 'both') ? activeClass : inactiveClass;
+
+            const soiEl = document.getElementById('soiText');
+            if (soiEl) {
+                if (lang === 'zh') {
+                    soiEl.textContent = '「真實世界現象可以被模擬為簡化的循環。」';
+                } else if (lang === 'both') {
+                    soiEl.textContent = '"Real world phenomena can be simulated as simplified cycles." | 「真實世界現象可以被模擬為簡化的循環。」';
+                } else {
+                    soiEl.textContent = '"Real world phenomena can be simulated as simplified cycles."';
+                }
+            }
+
+            if (currentViewMode === 'list') {
+                renderGlossaryList();
+            } else {
+                renderFlashcards();
+            }
+        }
+
         function shuffleCards() {
             // Shuffle ONLY the flashcard list so glossary order is never affected
             for (let i = flashcardOrderList.length - 1; i > 0; i--) {
@@ -1195,9 +1483,11 @@
             activeFocusIndex = 0;
             renderFlashcards();
             
-            const btn = event.currentTarget;
-            btn.classList.add('bg-[#f0f6fc]');
-            setTimeout(() => btn.classList.remove('bg-[#f0f6fc]'), 300);
+            if (typeof event !== 'undefined' && event && event.currentTarget) {
+                const btn = event.currentTarget;
+                btn.classList.add('bg-[#f0f6fc]');
+                setTimeout(() => btn.classList.remove('bg-[#f0f6fc]'), 300);
+            }
         }
 
         function triggerPrint(mode) {
@@ -1265,6 +1555,7 @@
         }
 
         document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (currentViewMode === 'flashcards' && cardLayout === 'focus') {
                 if (e.code === 'ArrowRight') {
                     navFocusCard(1);
